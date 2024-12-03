@@ -1,0 +1,4 @@
+name: GoblinsRegion
+version: '1.0-SNAPSHOT'
+main: Regula.goblinsRegion.GoblinsRegion
+api-version: '1.20'
