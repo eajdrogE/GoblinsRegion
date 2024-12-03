@@ -1,5 +1,6 @@
 package Regula.goblinsRegion.commands.adminscommands;
 
+import Regula.goblinsRegion.commands.adminscommands.regionscomands.changeregion;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -95,7 +96,7 @@ public class regions implements CommandExecutor, Listener {
             // Выполнение методов в зависимости от слота
             switch (slot) {
                 case 0: // Изменение регионов
-                    method1(player);
+                    player.performCommand("changeregion");
                     break;
                 case 1: // Изменение наций
                     method2(player);

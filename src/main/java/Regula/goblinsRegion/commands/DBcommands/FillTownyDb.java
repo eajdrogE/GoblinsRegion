@@ -68,6 +68,7 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("maxStability", 20);
             townJson.addProperty("prosperityGrowth", 0);
             townJson.addProperty("limitGrowth", 0);
+            townJson.addProperty("menuMaterial", "PAPER");
             try (FileWriter writer = new FileWriter(new File(townsDir, town.getName() + ".json"))) {
                 gson.toJson(townJson, writer);
             } catch (IOException e) {
@@ -100,7 +101,7 @@ public class FillTownyDb implements CommandExecutor {
             nationJson.addProperty("rulerName", "Default Ruler");
             nationJson.addProperty("rulerAge", 30);
             nationJson.addProperty("rulerRace", "Default Race");
-
+            nationJson.addProperty("menuMaterial", "PAPER");
             try (FileWriter writer = new FileWriter(new File(nationsDir, nation.getName() + ".json"))) {
                 gson.toJson(nationJson, writer);
             } catch (IOException e) {

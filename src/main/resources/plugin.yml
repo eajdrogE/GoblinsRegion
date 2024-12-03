@@ -9,3 +9,7 @@ commands:
   regions:
     description: "Меню настройки регионов."
     usage: "/regions"
+  changeregion:
+    description: Открывает меню списка регионов.
+    usage: /changeregion
+    permission: RegionModer
