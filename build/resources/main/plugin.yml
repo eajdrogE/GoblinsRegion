@@ -6,3 +6,6 @@ commands:
   filltownydb:
     description: "Заполняет базу данных городов и наций Towny."
     usage: "/filltownydb"
+  regions:
+    description: "Меню настройки регионов."
+    usage: "/regions"
