@@ -8,6 +8,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -15,14 +19,17 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Arrays;
 
-public class changeregion implements CommandExecutor {
+public class changeregion implements CommandExecutor, Listener {
 
     private final File townsDir;
 
-    public changeregion(File townsDir) {
-        this.townsDir = townsDir;
+    public changeregion() {
+        // Статичный путь к папке с данными городов
+        this.townsDir = new File("towny_data/towns"); // Укажите фактический путь
+        if (!townsDir.exists()) {
+            townsDir.mkdirs(); // Создаём папку, если она не существует
+        }
     }
 
     @Override
@@ -59,7 +66,7 @@ public class changeregion implements CommandExecutor {
         int totalPages = (int) Math.ceil((double) townFiles.length / townsPerPage); // Всего страниц
         page = Math.max(0, Math.min(page, totalPages - 1)); // Проверка допустимого диапазона страниц
 
-        Inventory inventory = Bukkit.createInventory(null, 54, "Список регионов (стр. " + (page + 1) + ")");
+        Inventory inventory = Bukkit.createInventory(null, 54, "Список регионов");
 
         JsonParser parser = new JsonParser();
         int start = page * townsPerPage; // Индекс начала текущей страницы
@@ -113,20 +120,46 @@ public class changeregion implements CommandExecutor {
             inventory.setItem(53, nextPage);
         }
 
-        // Заполнение остальных ячеек серым стеклом
-        ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
-        ItemMeta fillerMeta = filler.getItemMeta();
-        if (fillerMeta != null) {
-            fillerMeta.setDisplayName(" ");
-            filler.setItemMeta(fillerMeta);
-        }
-
-        for (int i = 45; i < 54; i++) {
-            if (inventory.getItem(i) == null) {
-                inventory.setItem(i, filler);
-            }
-        }
-
         player.openInventory(inventory);
     }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
+        // Проверяем, что это инвентарь региона
+        if (!event.getView().getTitle().startsWith("Список регионов")) return;
+
+        // Запрещаем любое взаимодействие с инвентарём
+        event.setCancelled(true);
+
+        Player player = (Player) event.getWhoClicked();
+        int slot = event.getRawSlot();
+
+        // Проверяем, что клик был в пределах отображаемого инвентаря
+        if (slot >= 0 && slot < 45) { // Слоты с городами
+            ItemStack clickedItem = event.getCurrentItem();
+
+            // Проверяем, что кликнутый предмет существует
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+            // Получаем Meta данных предмета
+            ItemMeta meta = clickedItem.getItemMeta();
+            if (meta == null || meta.getDisplayName() == null) return;
+
+            // Получаем название города из имени предмета
+            String townName = meta.getDisplayName();
+
+            // Выполняем команду для города
+            player.performCommand("regionpropertiesadmin " + townName);
+        } else if (slot == 45) { // Слот для предыдущей страницы
+            String currentTitle = event.getView().getTitle();
+            int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+            openRegionList(player, currentPage - 1);
+        } else if (slot == 53) { // Слот для следующей страницы
+            String currentTitle = event.getView().getTitle();
+            int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+            openRegionList(player, currentPage + 1);
+        }
+    }
+
+
 }

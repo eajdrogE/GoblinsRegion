@@ -13,3 +13,6 @@ commands:
     description: Открывает меню списка регионов.
     usage: /changeregion
     permission: RegionModer
+  regionpropertiesadmin:
+    description: "Открывает свойства указанного города"
+    usage: "/regionpropertiesadmin <город>"
