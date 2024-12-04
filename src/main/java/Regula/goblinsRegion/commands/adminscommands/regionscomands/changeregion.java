@@ -126,8 +126,8 @@ public class changeregion implements CommandExecutor, Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         // Проверяем, что это инвентарь региона
-        if (!event.getView().getTitle().startsWith("Список регионов")) return;
-
+        if (!event.getInventory().getViewers().isEmpty() && event.getInventory().getViewers().get(0).getOpenInventory().getTitle().equals("Список регионов"))
+        {
         // Запрещаем любое взаимодействие с инвентарём
         event.setCancelled(true);
 
@@ -165,6 +165,7 @@ public class changeregion implements CommandExecutor, Listener {
                     player.sendMessage("Этот слот не соответствует ни одному городу.");
                 }
             }
+        }
         }
     }
 
