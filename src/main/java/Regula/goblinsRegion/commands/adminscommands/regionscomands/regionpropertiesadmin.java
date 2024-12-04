@@ -26,6 +26,7 @@ import java.util.Map;
 public class regionpropertiesadmin implements CommandExecutor, Listener {
 
     private final File townsDir;
+    private String townName;
     private final Map<Player, String> editQueue = new HashMap<>(); // Хранение редактируемых параметров для игроков
 
     public regionpropertiesadmin(File townsDir) {
@@ -54,7 +55,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
             return true;
         }
 
-        String townName = args[0];
+        townName = args[0];
         openRegionProperties(player, townName);
         return true;
     }
@@ -75,7 +76,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
             return;
         }
 
-        Inventory inventory = Bukkit.createInventory(null, 27, "Свойства: " + townName);
+        Inventory inventory = Bukkit.createInventory(null, 27, "Регион: " + townName);
 
         // Заполнение инвентаря
         addPropertyToInventory(inventory, 0, Material.PAPER, "Имя", townData.get("name").getAsString());
@@ -114,7 +115,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!event.getView().getTitle().startsWith("Свойства: ")) return;
+        if (!event.getView().getTitle().startsWith("Регион: ")) return;
 
         event.setCancelled(true); // Запретить взаимодействие
 
@@ -147,10 +148,12 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         event.setCancelled(true); // Блокируем отправку сообщения в чат
 
         // Получение имени города из заголовка инвентаря
-        String inventoryTitle = player.getOpenInventory().getTitle();
-        String townName = inventoryTitle.replace("Свойства: ", "");
+
 
         File townFile = new File(townsDir, townName + ".json");
+        player.sendMessage("Путь к файлу: " + townFile.getAbsolutePath());
+        player.sendMessage("Файл существует: " + townFile.exists());
+        player.sendMessage("Можно читать: " + townFile.canRead());
         if (!townFile.exists()) {
             player.sendMessage("Файл города не найден.");
             editQueue.remove(player);
