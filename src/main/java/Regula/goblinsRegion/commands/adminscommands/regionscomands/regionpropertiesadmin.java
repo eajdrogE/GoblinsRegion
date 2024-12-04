@@ -8,26 +8,32 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class regionpropertiesadmin implements CommandExecutor, Listener {
 
     private final File townsDir;
+    private final Map<Player, String> editQueue = new HashMap<>(); // Хранение редактируемых параметров для игроков
 
     public regionpropertiesadmin(File townsDir) {
         this.townsDir = new File("towny_data/towns"); // Укажите ваш путь
         if (!townsDir.exists()) {
             townsDir.mkdirs(); // Создаем папку, если она не существует
         }
-        }
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -77,16 +83,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         addPropertyToInventory(inventory, 2, Material.GOLD_INGOT, "Благосостояние", townData.get("prosperity").getAsString());
         addPropertyToInventory(inventory, 3, Material.IRON_SWORD, "Лимит", townData.get("limit").getAsString());
         addPropertyToInventory(inventory, 4, Material.BREAD, "Очки восстановления", townData.get("replenishmentPoints").getAsString());
-        addPropertyToInventory(inventory, 5, Material.NETHER_STAR, "Культура", townData.get("culture").getAsString());
-        addPropertyToInventory(inventory, 6, Material.IRON_PICKAXE, "Ресурсы", townData.get("resources").toString());
-        addPropertyToInventory(inventory, 7, Material.WATER_BUCKET, "Доступ к морю", townData.get("hasSeaAccess").getAsString());
-        addPropertyToInventory(inventory, 8, Material.IRON_BLOCK, "Базовая стабильность", townData.get("baseStability").getAsString());
-        addPropertyToInventory(inventory, 9, Material.IRON_NUGGET, "Прирост стабильности до базового", townData.get("stabilityGrowthToBase").getAsString());
-        addPropertyToInventory(inventory, 10, Material.CHAIN, "Прирост стабильности сверх базового", townData.get("stabilityGrowthBeyondBase").getAsString());
-        addPropertyToInventory(inventory, 11, Material.IRON_INGOT, "Максимальная стабильность", townData.get("maxStability").getAsString());
-        addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "Прирост благосостояния", townData.get("prosperityGrowth").getAsString());
-        addPropertyToInventory(inventory, 13, Material.CAKE, "Прирост лимита", townData.get("limitGrowth").getAsString());
-        addPropertyToInventory(inventory, 14, Material.PAPER, "Материал меню", townData.get("menuMaterial").getAsString());
+        // Добавьте другие параметры аналогично
 
         // Заполнение оставшихся слотов серым стеклом
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
@@ -115,7 +112,8 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         inventory.setItem(slot, item);
     }
 
-    public void handleInventoryClick(InventoryClickEvent event) {
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent event) {
         if (!event.getView().getTitle().startsWith("Свойства: ")) return;
 
         event.setCancelled(true); // Запретить взаимодействие
@@ -123,40 +121,57 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
 
         Player player = (Player) event.getWhoClicked();
-        int slot = event.getSlot();
+        ItemStack clickedItem = event.getCurrentItem();
+        String itemName = clickedItem.getItemMeta().getDisplayName();
 
-        // Обработка кликов по слотам
-        switch (slot) {
-            case 0 -> method1(player);
-            case 1 -> method2(player);
-            case 2 -> method3(player);
-            case 3 -> method4(player);
-            case 4 -> method5(player);
-            case 5 -> method6(player);
-            case 6 -> method7(player);
-            case 7 -> method8(player);
-            case 8 -> method9(player);
-            case 9 -> method10(player);
-            case 10 -> method11(player);
-            case 11 -> method12(player);
-            case 12 -> method13(player);
-            case 13 -> method14(player);
-        }
+        // Получение названия редактируемого параметра
+        String[] parts = itemName.split(": ");
+        if (parts.length < 2) return;
+
+        String propertyName = parts[0]; // Название параметра
+        player.sendMessage("Введите новое значение для параметра: " + propertyName);
+        player.closeInventory();
+
+        // Сохранение в очередь редактирования
+        editQueue.put(player, propertyName);
     }
 
-    // Пример методов (пустые, реализуйте по необходимости)
-    private void method1(Player player) { player.sendMessage("Вызван method1"); }
-    private void method2(Player player) { player.sendMessage("Вызван method2"); }
-    private void method3(Player player) { player.sendMessage("Вызван method3"); }
-    private void method4(Player player) { player.sendMessage("Вызван method4"); }
-    private void method5(Player player) { player.sendMessage("Вызван method5"); }
-    private void method6(Player player) { player.sendMessage("Вызван method6"); }
-    private void method7(Player player) { player.sendMessage("Вызван method7"); }
-    private void method8(Player player) { player.sendMessage("Вызван method8"); }
-    private void method9(Player player) { player.sendMessage("Вызван method9"); }
-    private void method10(Player player) { player.sendMessage("Вызван method10"); }
-    private void method11(Player player) { player.sendMessage("Вызван method11"); }
-    private void method12(Player player) { player.sendMessage("Вызван method12"); }
-    private void method13(Player player) { player.sendMessage("Вызван method13"); }
-    private void method14(Player player) { player.sendMessage("Вызван method14"); }
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+        Player player = event.getPlayer();
+
+        if (!editQueue.containsKey(player)) return;
+
+        String propertyName = editQueue.get(player);
+        String newValue = event.getMessage(); // Новое значение от игрока
+        event.setCancelled(true); // Блокируем отправку сообщения в чат
+
+        // Получение имени города из заголовка инвентаря
+        String inventoryTitle = player.getOpenInventory().getTitle();
+        String townName = inventoryTitle.replace("Свойства: ", "");
+
+        File townFile = new File(townsDir, townName + ".json");
+        if (!townFile.exists()) {
+            player.sendMessage("Файл города не найден.");
+            editQueue.remove(player);
+            return;
+        }
+
+        try (FileReader reader = new FileReader(townFile)) {
+            JsonObject townData = JsonParser.parseReader(reader).getAsJsonObject();
+            townData.addProperty(propertyName, newValue); // Обновление значения
+
+            // Сохранение изменений
+            try (FileWriter writer = new FileWriter(townFile)) {
+                writer.write(townData.toString());
+            }
+
+            player.sendMessage("Параметр " + propertyName + " успешно обновлён на " + newValue);
+        } catch (IOException e) {
+            player.sendMessage("Ошибка при обновлении данных города.");
+            e.printStackTrace();
+        }
+
+        editQueue.remove(player); // Удаление из очереди редактирования
+    }
 }

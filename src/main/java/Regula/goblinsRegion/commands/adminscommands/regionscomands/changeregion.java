@@ -126,7 +126,7 @@ public class changeregion implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
 
@@ -150,9 +150,23 @@ public class changeregion implements CommandExecutor, Listener {
                 return;
             }
 
-            String townName = clickedItem.getItemMeta().getDisplayName(); // Получаем название города
-            player.performCommand("regionpropertiesadmin " + townName); // Выполняем команду
-            player.sendMessage("Вы выбрали город: " + townName); // Уведомляем игрока
+            String itemName = clickedItem.getItemMeta().getDisplayName();
+
+            // Обработка перехода между страницами
+            if (itemName.equals("Предыдущая страница")) {
+                String[] titleParts = event.getView().getTitle().split(" "); // Разделяем заголовок для получения страницы
+                int currentPage = titleParts.length > 1 ? Integer.parseInt(titleParts[1]) : 0;
+                openRegionList(player, currentPage - 1); // Переход на предыдущую страницу
+            } else if (itemName.equals("Следующая страница")) {
+                String[] titleParts = event.getView().getTitle().split(" "); // Разделяем заголовок для получения страницы
+                int currentPage = titleParts.length > 1 ? Integer.parseInt(titleParts[1]) : 0;
+                openRegionList(player, currentPage + 1); // Переход на следующую страницу
+            } else {
+                // Если это не стрелка, обрабатываем как выбор города
+                String townName = itemName;
+                player.performCommand("regionpropertiesadmin " + townName); // Выполняем команду
+                player.sendMessage("Вы выбрали город: " + townName); // Уведомляем игрока
+            }
         }
     }
 
