@@ -135,31 +135,39 @@ public class changeregion implements CommandExecutor, Listener {
         int slot = event.getRawSlot();
 
         // Проверяем, что клик был в пределах отображаемого инвентаря
-        if (slot >= 0 && slot < 45) { // Слоты с городами
-            ItemStack clickedItem = event.getCurrentItem();
+        if (slot >= 0 && slot < 54) {
+            if (slot == 45) { // Слот для предыдущей страницы
+                String currentTitle = event.getView().getTitle();
+                int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+                openRegionList(player, currentPage - 1);
+            } else if (slot == 53) { // Слот для следующей страницы
+                String currentTitle = event.getView().getTitle();
+                int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+                openRegionList(player, currentPage + 1);
+            } else {
+                // Работа с файлами в папке towns
+                File townsFolder = new File("towny_data/towns");
+                File[] townFiles = townsFolder.listFiles((dir, name) -> name.endsWith(".json")); // Фильтруем только JSON-файлы
 
-            // Проверяем, что кликнутый предмет существует
-            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+                if (townFiles == null || townFiles.length == 0) {
+                    player.sendMessage("Список городов пуст!");
+                    return;
+                }
 
-            // Получаем Meta данных предмета
-            ItemMeta meta = clickedItem.getItemMeta();
-            if (meta == null || meta.getDisplayName() == null) return;
+                // Проверяем, что номер слота соответствует номеру файла
+                if (slot < townFiles.length) {
+                    File selectedTownFile = townFiles[slot];
+                    String townName = selectedTownFile.getName().replace(".json", ""); // Убираем расширение .json
 
-            // Получаем название города из имени предмета
-            String townName = meta.getDisplayName();
-
-            // Выполняем команду для города
-            player.performCommand("regionpropertiesadmin " + townName);
-        } else if (slot == 45) { // Слот для предыдущей страницы
-            String currentTitle = event.getView().getTitle();
-            int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-            openRegionList(player, currentPage - 1);
-        } else if (slot == 53) { // Слот для следующей страницы
-            String currentTitle = event.getView().getTitle();
-            int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-            openRegionList(player, currentPage + 1);
+                    // Выполняем команду для выбранного города
+                    player.performCommand("regionpropertiesadmin " + townName);
+                } else {
+                    player.sendMessage("Этот слот не соответствует ни одному городу.");
+                }
+            }
         }
     }
+
 
 
 }
