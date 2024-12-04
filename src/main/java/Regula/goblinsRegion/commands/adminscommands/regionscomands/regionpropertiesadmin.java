@@ -25,12 +25,12 @@ import java.util.Map;
 
 public class regionpropertiesadmin implements CommandExecutor, Listener {
 
-    private final File townsDir;
+    private final File townsDir= new File("towny_data/towns");
     private String townName;
     private final Map<Player, String> editQueue = new HashMap<>(); // Хранение редактируемых параметров для игроков
 
     public regionpropertiesadmin(File townsDir) {
-        this.townsDir = new File("towny_data/towns"); // Укажите ваш путь
+      // Укажите ваш путь
         if (!townsDir.exists()) {
             townsDir.mkdirs(); // Создаем папку, если она не существует
         }
@@ -56,11 +56,13 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         }
 
         townName = args[0];
-        openRegionProperties(player, townName);
+        player.sendMessage("Название города: " + townName);
+
+        openRegionProperties(player);
         return true;
     }
 
-    public void openRegionProperties(Player player, String townName) {
+    public void openRegionProperties(Player player) {
         File townFile = new File(townsDir, townName + ".json");
         if (!townFile.exists()) {
             player.sendMessage("Данные о городе " + townName + " не найдены.");
@@ -151,6 +153,14 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
 
         File townFile = new File(townsDir, townName + ".json");
+        JsonObject townData;
+        try (FileReader reader = new FileReader(townFile)) {
+            townData = JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException e) {
+            player.sendMessage("Ошибка чтения данных города.");
+            e.printStackTrace();
+            return;
+        }
         player.sendMessage("Путь к файлу: " + townFile.getAbsolutePath());
         player.sendMessage("Файл существует: " + townFile.exists());
         player.sendMessage("Можно читать: " + townFile.canRead());
