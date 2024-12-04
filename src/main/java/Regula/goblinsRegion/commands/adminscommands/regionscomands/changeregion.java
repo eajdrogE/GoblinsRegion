@@ -3,6 +3,7 @@ package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -66,7 +67,8 @@ public class changeregion implements CommandExecutor, Listener {
         int totalPages = (int) Math.ceil((double) townFiles.length / townsPerPage); // Всего страниц
         page = Math.max(0, Math.min(page, totalPages - 1)); // Проверка допустимого диапазона страниц
 
-        Inventory inventory = Bukkit.createInventory(null, 54, "Список регионов");
+        Inventory inventory = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "Меню настройки регионов");
+
 
         JsonParser parser = new JsonParser();
         int start = page * townsPerPage; // Индекс начала текущей страницы
@@ -125,50 +127,37 @@ public class changeregion implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        // Проверяем, что это инвентарь региона
-        if (!event.getInventory().getViewers().isEmpty() && event.getInventory().getViewers().get(0).getOpenInventory().getTitle().equals("Список регионов"))
-        {
-        // Запрещаем любое взаимодействие с инвентарём
-        event.setCancelled(true);
+        // Проверяем, что это инвентарь "Regions list"
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "Regions_list")) {
+            event.setCancelled(true);
+            if (event.getCurrentItem() != null) {
+                Player player = (Player) event.getWhoClicked();
+                player.sendMessage("Нажал в инвентаре");
+                int slot = event.getSlot();
 
-        Player player = (Player) event.getWhoClicked();
-        int slot = event.getRawSlot();
-
-        // Проверяем, что клик был в пределах отображаемого инвентаря
-        if (slot >= 0 && slot < 54) {
-            if (slot == 45) { // Слот для предыдущей страницы
-                String currentTitle = event.getView().getTitle();
-                int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-                openRegionList(player, currentPage - 1);
-            } else if (slot == 53) { // Слот для следующей страницы
-                String currentTitle = event.getView().getTitle();
-                int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-                openRegionList(player, currentPage + 1);
-            } else {
-                // Работа с файлами в папке towns
-                File townsFolder = new File("towny_data/towns");
-                File[] townFiles = townsFolder.listFiles((dir, name) -> name.endsWith(".json")); // Фильтруем только JSON-файлы
-
-                if (townFiles == null || townFiles.length == 0) {
-                    player.sendMessage("Список городов пуст!");
-                    return;
-                }
-
-                // Проверяем, что номер слота соответствует номеру файла
-                if (slot < townFiles.length) {
-                    File selectedTownFile = townFiles[slot];
-                    String townName = selectedTownFile.getName().replace(".json", ""); // Убираем расширение .json
-
-                    // Выполняем команду для выбранного города
-                    player.performCommand("regionpropertiesadmin " + townName);
-                } else {
-                    player.sendMessage("Этот слот не соответствует ни одному городу.");
+                // Проверяем, что клик был в пределах отображаемого инвентаря
+                if (slot >= 0 && slot < 54) {
+                    if (slot == 45) { // Слот для предыдущей страницы
+                        String currentTitle = event.getView().getTitle();
+                        int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+                        openRegionList(player, currentPage - 1);
+                    } else if (slot == 53) { // Слот для следующей страницы
+                        String currentTitle = event.getView().getTitle();
+                        int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
+                        openRegionList(player, currentPage + 1);
+                    } else {
+                        // Получаем предмет из слота
+                        ItemStack clickedItem = event.getCurrentItem();
+                        if (clickedItem.hasItemMeta() && clickedItem.getItemMeta().hasDisplayName()) {
+                            String townName = clickedItem.getItemMeta().getDisplayName(); // Получаем название города из имени предмета
+                            player.performCommand("regionpropertiesadmin " + townName); // Выполняем команду
+                        } else {
+                            player.sendMessage("Не удалось определить название города.");
+                        }
+                    }
+                    player.sendMessage("прошел проверку на слот");
                 }
             }
         }
-        }
     }
-
-
-
 }
