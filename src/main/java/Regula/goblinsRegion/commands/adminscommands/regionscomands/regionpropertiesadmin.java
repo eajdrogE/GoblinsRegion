@@ -25,14 +25,25 @@ import java.util.Map;
 
 public class regionpropertiesadmin implements CommandExecutor, Listener {
 
-    private final File townsDir= new File("towny_data/towns");
+    private final File townsDir = new File("towny_data/towns");
     private String townName;
-    private final Map<Player, String> editQueue = new HashMap<>(); // Хранение редактируемых параметров для игроков
+    private final Map<Player, EditData> editQueue = new HashMap<>(); // Хранение редактируемых параметров для игроков
 
     public regionpropertiesadmin(File townsDir) {
-      // Укажите ваш путь
+        // Укажите ваш путь
         if (!townsDir.exists()) {
             townsDir.mkdirs(); // Создаем папку, если она не существует
+        }
+    }
+
+    // Класс для хранения данных редактируемого параметра и региона
+    private static class EditData {
+        String propertyName;
+        String regionName;
+
+        EditData(String propertyName, String regionName) {
+            this.propertyName = propertyName;
+            this.regionName = regionName;
         }
     }
 
@@ -135,52 +146,61 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         player.sendMessage("Введите новое значение для параметра: " + propertyName);
         player.closeInventory();
 
-        // Сохранение в очередь редактирования
-        editQueue.put(player, propertyName);
+        // Сохранение в очередь редактирования с именем региона
+        editQueue.put(player, new EditData(propertyName, townName));
     }
 
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
 
+        // Проверяем, находится ли игрок в очереди редактирования
         if (!editQueue.containsKey(player)) return;
 
-        String propertyName = editQueue.get(player);
+        EditData editData = editQueue.get(player); // Получаем данные для редактирования
+        String propertyName = editData.propertyName; // Имя редактируемого параметра
+        String regionName = editData.regionName; // Имя региона
         String newValue = event.getMessage(); // Новое значение от игрока
         event.setCancelled(true); // Блокируем отправку сообщения в чат
 
-        // Получение имени города из заголовка инвентаря
+        // Формируем путь к файлу JSON
+        File townFile = new File(townsDir, regionName + ".json");
 
-
-        File townFile = new File(townsDir, townName + ".json");
-        JsonObject townData;
-        try (FileReader reader = new FileReader(townFile)) {
-            townData = JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            player.sendMessage("Ошибка чтения данных города.");
-            e.printStackTrace();
-            return;
-        }
+        // Логирование для отладки
+        player.sendMessage("Название города: " + regionName);
         player.sendMessage("Путь к файлу: " + townFile.getAbsolutePath());
         player.sendMessage("Файл существует: " + townFile.exists());
         player.sendMessage("Можно читать: " + townFile.canRead());
+
+        // Проверяем, существует ли файл
         if (!townFile.exists()) {
             player.sendMessage("Файл города не найден.");
             editQueue.remove(player);
             return;
         }
 
+        // Чтение данных из JSON
+        JsonObject townData;
         try (FileReader reader = new FileReader(townFile)) {
-            JsonObject townData = JsonParser.parseReader(reader).getAsJsonObject();
-            townData.addProperty(propertyName, newValue); // Обновление значения
+            townData = JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException e) {
+            player.sendMessage("Ошибка чтения данных города.");
+            e.printStackTrace();
+            editQueue.remove(player);
+            return;
+        }
 
-            // Сохранение изменений
+        // Обновляем указанное свойство
+        try {
+            townData.addProperty(propertyName, newValue); // Добавляем или изменяем свойство
+
+            // Записываем обновленный JSON обратно в файл
             try (FileWriter writer = new FileWriter(townFile)) {
                 writer.write(townData.toString());
             }
 
-            player.sendMessage("Параметр " + propertyName + " успешно обновлён на " + newValue);
-        } catch (IOException e) {
+            player.sendMessage("Параметр \"" + propertyName + "\" успешно обновлён на \"" + newValue + "\".");
+        } catch (Exception e) {
             player.sendMessage("Ошибка при обновлении данных города.");
             e.printStackTrace();
         }
