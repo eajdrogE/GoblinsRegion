@@ -14,14 +14,16 @@ public final class GoblinsRegion extends JavaPlugin {
     @Override
     public void onEnable() {
         // Регистрация команд
-
-
-        registerCommand("regions", new regions(this));
-        registerCommand("filltownydb", new FillTownyDb());
-        registerCommand("changeregion", new FillTownyDb());
-
         File townsDir = null;
         townsDir = new File(getDataFolder(), "towny_data/towns");
+
+        registerCommand("regions", new regions(this));
+        getServer().getPluginManager().registerEvents(new changeregion(), this);
+        registerCommand("filltownydb", new FillTownyDb());
+        registerCommand("changeregion", new changeregion());
+        registerCommand("regionpropertiesadmin", new regionpropertiesadmin(townsDir));
+
+
         getCommand("changeregion").setExecutor(new changeregion());
         getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin(townsDir));
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(townsDir), this);

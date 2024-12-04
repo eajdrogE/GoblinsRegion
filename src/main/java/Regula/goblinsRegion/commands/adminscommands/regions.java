@@ -96,7 +96,7 @@ public class regions implements CommandExecutor, Listener {
             // Выполнение методов в зависимости от слота
             switch (slot) {
                 case 0: // Изменение регионов
-                    player.performCommand("changeregion");
+                    player.chat("/changeregion");
                     break;
                 case 1: // Изменение наций
                     method2(player);
@@ -124,9 +124,7 @@ public class regions implements CommandExecutor, Listener {
     }
 
     // Заглушки для методов
-    private void method1(Player player) {
-        player.sendMessage("Вызван метод 1: Изменение регионов");
-    }
+
 
     private void method2(Player player) {
         player.sendMessage("Вызван метод 2: Изменение наций");

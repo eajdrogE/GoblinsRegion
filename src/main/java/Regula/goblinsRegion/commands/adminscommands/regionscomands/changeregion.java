@@ -10,6 +10,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -67,7 +68,7 @@ public class changeregion implements CommandExecutor, Listener {
         int totalPages = (int) Math.ceil((double) townFiles.length / townsPerPage); // Всего страниц
         page = Math.max(0, Math.min(page, totalPages - 1)); // Проверка допустимого диапазона страниц
 
-        Inventory inventory = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "Меню настройки регионов");
+        Inventory inventory = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "RegionList");
 
 
         JsonParser parser = new JsonParser();
@@ -125,39 +126,36 @@ public class changeregion implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event) {
-        // Проверяем, что это инвентарь "Regions list"
-        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "Regions_list")) {
-            event.setCancelled(true);
-            if (event.getCurrentItem() != null) {
-                Player player = (Player) event.getWhoClicked();
-                player.sendMessage("Нажал в инвентаре");
-                int slot = event.getSlot();
+        Player player = (Player) event.getWhoClicked();
 
-                // Проверяем, что клик был в пределах отображаемого инвентаря
-                if (slot >= 0 && slot < 54) {
-                    if (slot == 45) { // Слот для предыдущей страницы
-                        String currentTitle = event.getView().getTitle();
-                        int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-                        openRegionList(player, currentPage - 1);
-                    } else if (slot == 53) { // Слот для следующей страницы
-                        String currentTitle = event.getView().getTitle();
-                        int currentPage = Integer.parseInt(currentTitle.replaceAll("\\D", "")) - 1;
-                        openRegionList(player, currentPage + 1);
-                    } else {
-                        // Получаем предмет из слота
-                        ItemStack clickedItem = event.getCurrentItem();
-                        if (clickedItem.hasItemMeta() && clickedItem.getItemMeta().hasDisplayName()) {
-                            String townName = clickedItem.getItemMeta().getDisplayName(); // Получаем название города из имени предмета
-                            player.performCommand("regionpropertiesadmin " + townName); // Выполняем команду
-                        } else {
-                            player.sendMessage("Не удалось определить название города.");
-                        }
-                    }
-                    player.sendMessage("прошел проверку на слот");
-                }
+        // Проверяем, что это наш кастомный инвентарь
+        if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "RegionList")) {
+            event.setCancelled(true); // Блокируем взаимодействие
+
+            // Проверка, что клик в верхнем инвентаре
+            int slot = event.getRawSlot();
+            if (slot >= event.getView().getTopInventory().getSize()) {
+                return; // Игнорируем клики в инвентаре игрока
             }
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) {
+                return; // Игнорируем пустые слоты
+            }
+
+            // Проверяем наличие метаданных
+            if (!clickedItem.hasItemMeta() || clickedItem.getItemMeta().getDisplayName() == null) {
+                return;
+            }
+
+            String townName = clickedItem.getItemMeta().getDisplayName(); // Получаем название города
+            player.performCommand("regionpropertiesadmin " + townName); // Выполняем команду
+            player.sendMessage("Вы выбрали город: " + townName); // Уведомляем игрока
         }
     }
+
+
 }
+
