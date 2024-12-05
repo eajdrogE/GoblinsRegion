@@ -1,24 +1,23 @@
 package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.hover.content.Text;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.EventHandler;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
-public class regionchangeproperties implements CommandExecutor, Listener {
+public class regionchangeproperties implements CommandExecutor {
 
     private final File townsDir = new File("towny_data/towns");
 
@@ -43,7 +42,12 @@ public class regionchangeproperties implements CommandExecutor, Listener {
         }
 
         String propertyName = args[0]; // Имя свойства
-        String townName = args[1]; // Имя города
+        String townName = args[1];
+
+        // Убираем кавычки, если они есть в начале и конце строки (для корректного имени города)
+        if (townName.startsWith("\"") && townName.endsWith("\"")) {
+            townName = townName.substring(1, townName.length() - 1);  // Удаляем кавычки
+        }
 
         // Проверка существования файла города
         File townFile = new File(townsDir, townName + ".json");
@@ -52,52 +56,49 @@ public class regionchangeproperties implements CommandExecutor, Listener {
             return true;
         }
 
-        // Уведомление игрока и запрос ввода
-        player.sendMessage("Вы редактируете свойство: " + propertyName + ". Пожалуйста, введите новое значение.");
+        // Если значение передано, сразу обновляем JSON
+        if (args.length >= 3) {
+            String newValue = args[2]; // Значение, которое нужно установить
+            return updateTownProperty(player, propertyName, townName, newValue);
+        }
 
-        // Сохраняем имя редактируемого свойства и города для дальнейшего использования
-        // Мы будем использовать переменную для хранения этих значений, чтобы их использовать в событии чата
-        // Например, можно использовать Map<Player, EditData>, чтобы для каждого игрока запоминать, что они редактируют
-        // Вместо EditData можно сразу запомнить имя города и название свойства.
+        // Если значения нет, выводим запрос на ввод через чат
+        player.sendMessage("Вы хотите изменить свойство " + propertyName + " города " + townName + "?");
 
-        // Пишем в карту, чтобы получить это значение в событии чата
-        regionChangeQueue.put(player, new EditData(propertyName, townName));
+        // Формируем команду для вставки в текстовое поле
+        String commandMessage = "/regionchangeproperties " + propertyName + " \"" + townName + "\" ";
 
+        // Формируем JSON для tellraw с кнопкой "ДА"
+        TextComponent message = new TextComponent("Хотите изменить значение свойства " + propertyName + " города " + townName + "?\n");
+
+        // Создаем кнопку "ДА"
+        TextComponent yesButton = new TextComponent("ДА");
+        yesButton.setColor(net.md_5.bungee.api.ChatColor.GREEN);
+        yesButton.setUnderlined(true);
+
+        // Добавляем в кнопку команду для вставки текста в чат (вызывается при клике)
+        yesButton.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(net.md_5.bungee.api.chat.ClickEvent.Action.SUGGEST_COMMAND, commandMessage));
+
+        // Добавляем кнопку в сообщение
+        message.addExtra(yesButton);
+
+        // Отправляем сообщение через Spigot API с кнопкой "ДА"
+        player.spigot().sendMessage(message);
         return true;
     }
 
-    private Map<Player, EditData> regionChangeQueue = new HashMap<>(); // Хранение данных редактируемых параметров для игроков
-
-    private static class EditData {
-        String propertyName;
-        String townName;
-
-        EditData(String propertyName, String townName) {
-            this.propertyName = propertyName;
-            this.townName = townName;
+    // Метод для обновления свойства города в JSON
+    private boolean updateTownProperty(Player player, String propertyName, String townName, String newValue) {
+        // Убираем кавычки из имени города, если они есть
+        if (townName.startsWith("\"") && townName.endsWith("\"")) {
+            townName = townName.substring(1, townName.length() - 1);  // Удаляем кавычки
         }
-    }
 
-    @EventHandler
-    public void onPlayerChat(AsyncPlayerChatEvent event) {
-        Player player = event.getPlayer();
-
-        // Если игрок не редактирует свойство, пропускаем
-        if (!regionChangeQueue.containsKey(player)) return;
-
-        // Получаем данные редактируемого свойства и города
-        EditData editData = regionChangeQueue.get(player);
-        String propertyName = editData.propertyName;
-        String townName = editData.townName;
-
-        // Получаем введенное значение
-        String newValue = event.getMessage();
-
-        // Найдем файл города
+        // Проверка существования файла города
         File townFile = new File(townsDir, townName + ".json");
         if (!townFile.exists()) {
-            player.sendMessage("Ошибка: Город не найден.");
-            return;
+            player.sendMessage("Город " + townName + " не найден.");
+            return true;
         }
 
         // Чтение JSON файла
@@ -107,13 +108,13 @@ public class regionchangeproperties implements CommandExecutor, Listener {
         } catch (IOException e) {
             player.sendMessage("Ошибка чтения данных города.");
             e.printStackTrace();
-            return;
+            return true;
         }
 
         // Проверяем, существует ли указанное свойство в JSON
         if (!townData.has(propertyName)) {
             player.sendMessage("Свойство " + propertyName + " не найдено в данных города.");
-            return;
+            return true;
         }
 
         // Обновляем свойство в JSON
@@ -125,13 +126,12 @@ public class regionchangeproperties implements CommandExecutor, Listener {
         } catch (IOException e) {
             player.sendMessage("Ошибка сохранения данных города.");
             e.printStackTrace();
-            return;
+            return true;
         }
 
         // Сообщаем игроку, что данные обновлены
         player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
 
-        // Убираем игрока из очереди редактирования
-        regionChangeQueue.remove(player);
+        return true;
     }
 }

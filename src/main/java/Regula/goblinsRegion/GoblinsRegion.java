@@ -23,12 +23,8 @@ public final class GoblinsRegion extends JavaPlugin {
         registerCommand("filltownydb", new FillTownyDb());
         registerCommand("changeregion", new changeregion());
         registerCommand("regionpropertiesadmin", new regionpropertiesadmin(townsDir));
-        this.getCommand("regionchangeproperties").setExecutor(new regionchangeproperties(getDataFolder()));
-
-        // Регистрация слушателя событий
-        getServer().getPluginManager().registerEvents(new regionchangeproperties(getDataFolder()), this);
-
-
+        registerCommand("regionchangeproperties", new regionchangeproperties(townsDir));
+        getCommand("regionchangeproperties").setExecutor(new regionchangeproperties(townsDir));
         getCommand("changeregion").setExecutor(new changeregion());
         getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin(townsDir));
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(townsDir), this);
