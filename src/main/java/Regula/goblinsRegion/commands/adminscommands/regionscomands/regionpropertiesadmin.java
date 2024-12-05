@@ -78,20 +78,36 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
             paperMeta.setDisplayName("Информация о регионе");
             StringBuilder loreBuilder = new StringBuilder();
             loreBuilder.append("name: ").append(townData.get("name").getAsString()).append("\n");
-            loreBuilder.append("stability: ").append(townData.get("stability").getAsString()).append("\n");
-            loreBuilder.append("prosperity: ").append(townData.get("prosperity").getAsString()).append("\n");
-            loreBuilder.append("limit: ").append(townData.get("limit").getAsString()).append("\n");
-            loreBuilder.append("replenishmentPoints: ").append(townData.get("replenishmentPoints").getAsString()).append("\n");
+            loreBuilder.append("stability: ").append(townData.get("stability").getAsInt()).append("\n");
+            loreBuilder.append("prosperity: ").append(townData.get("prosperity").getAsInt()).append("\n");
+            loreBuilder.append("limit: ").append(townData.get("limit").getAsInt()).append("\n");
+            loreBuilder.append("replenishmentPoints: ").append(townData.get("replenishmentPoints").getAsInt()).append("\n");
+            loreBuilder.append("culture: ").append(townData.get("culture").getAsString()).append("\n");
+            loreBuilder.append("hasSeaAccess: ").append(townData.get("hasSeaAccess").getAsBoolean()).append("\n");
+            loreBuilder.append("baseStability: ").append(townData.get("baseStability").getAsInt()).append("\n");
+            loreBuilder.append("stabilityGrowthToBase: ").append(townData.get("stabilityGrowthToBase").getAsInt()).append("\n");
+            loreBuilder.append("stabilityGrowthBeyondBase: ").append(townData.get("stabilityGrowthBeyondBase").getAsInt()).append("\n");
+            loreBuilder.append("maxStability: ").append(townData.get("maxStability").getAsInt()).append("\n");
+            loreBuilder.append("prosperityGrowth: ").append(townData.get("prosperityGrowth").getAsInt()).append("\n");
+            loreBuilder.append("limitGrowth: ").append(townData.get("limitGrowth").getAsInt()).append("\n");
             paperMeta.setLore(loreBuilder.toString().lines().toList());
             infoPaper.setItemMeta(paperMeta);
         }
         inventory.setItem(0, infoPaper);
         // Заполнение инвентаря
         addPropertyToInventory(inventory, 1, Material.PAPER, "name", townData.get("name").getAsString());
-        addPropertyToInventory(inventory, 2, Material.ANVIL, "stability", townData.get("stability").getAsString());
-        addPropertyToInventory(inventory, 3, Material.GOLD_INGOT, "prosperity", townData.get("prosperity").getAsString());
-        addPropertyToInventory(inventory, 4, Material.IRON_SWORD, "limit", townData.get("limit").getAsString());
-        addPropertyToInventory(inventory, 5, Material.BREAD, "replenishmentPoints", townData.get("replenishmentPoints").getAsString());
+        addPropertyToInventory(inventory, 2, Material.ANVIL, "stability", String.valueOf(townData.get("stability").getAsInt()));
+        addPropertyToInventory(inventory, 3, Material.GOLD_INGOT, "prosperity", String.valueOf(townData.get("prosperity").getAsInt()));
+        addPropertyToInventory(inventory, 4, Material.IRON_SWORD, "limit", String.valueOf(townData.get("limit").getAsInt()));
+        addPropertyToInventory(inventory, 5, Material.BREAD, "replenishmentPoints", String.valueOf(townData.get("replenishmentPoints").getAsInt()));
+        addPropertyToInventory(inventory, 6, Material.PAPER, "culture", townData.get("culture").getAsString());
+        addPropertyToInventory(inventory, 7, Material.WATER_BUCKET, "hasSeaAccess", String.valueOf(townData.get("hasSeaAccess").getAsBoolean()));
+        addPropertyToInventory(inventory, 8, Material.DIAMOND, "baseStability", String.valueOf(townData.get("baseStability").getAsInt()));
+        addPropertyToInventory(inventory, 9, Material.REDSTONE, "stabilityGrowthToBase", String.valueOf(townData.get("stabilityGrowthToBase").getAsInt()));
+        addPropertyToInventory(inventory, 10, Material.REDSTONE_TORCH, "stabilityGrowthBeyondBase", String.valueOf(townData.get("stabilityGrowthBeyondBase").getAsInt()));
+        addPropertyToInventory(inventory, 11, Material.EMERALD, "maxStability", String.valueOf(townData.get("maxStability").getAsInt()));
+        addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "prosperityGrowth", String.valueOf(townData.get("prosperityGrowth").getAsInt()));
+        addPropertyToInventory(inventory, 13, Material.IRON_BLOCK, "limitGrowth", String.valueOf(townData.get("limitGrowth").getAsInt()));
 
         player.openInventory(inventory);
     }
@@ -131,12 +147,11 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
         // Формирование команды
         String command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
-        player.closeInventory();
-        String tellrawCommand = String.format(
-                "tellraw %s {\"text\":\"Команда для ввода в терминал: %s\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"%s\"}}",
-                player.getName(), command, command);
 
-// Отправляем команду на выполнение
-        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), tellrawCommand);
+// Закрываем инвентарь
+        player.closeInventory();
+
+// Вставляем команду в чат (как если бы игрок её сам ввёл)
+        player.chat(command);
     }
 }
