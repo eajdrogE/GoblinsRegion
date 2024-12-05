@@ -108,7 +108,11 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         addPropertyToInventory(inventory, 11, Material.EMERALD, "maxStability", String.valueOf(townData.get("maxStability").getAsInt()));
         addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "prosperityGrowth", String.valueOf(townData.get("prosperityGrowth").getAsInt()));
         addPropertyToInventory(inventory, 13, Material.IRON_BLOCK, "limitGrowth", String.valueOf(townData.get("limitGrowth").getAsInt()));
+        addPropertyToInventory(inventory, 14, Material.CHEST, "resources", townData.get("resources").toString());
 
+        // Добавление материала меню (menuMaterial)
+        Material menuMaterial = Material.valueOf(townData.get("menuMaterial").getAsString().toUpperCase());
+        addPropertyToInventory(inventory, 15, menuMaterial, "menuMaterial", townData.get("menuMaterial").getAsString());
         player.openInventory(inventory);
     }
 
@@ -145,13 +149,16 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
         String propertyName = parts[0]; // Название параметра
 
-        // Формирование команды
-        String command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
 
+        String command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
+        if (itemName.startsWith("resources"))
+
+            command = "/regionchangeresources "+ "\"" + townName + "\"";
 // Закрываем инвентарь
-        player.closeInventory();
+            player.closeInventory();
 
 // Вставляем команду в чат (как если бы игрок её сам ввёл)
-        player.chat(command);
+            player.chat(command);
+        }
     }
-}
+

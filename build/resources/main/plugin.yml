@@ -10,9 +10,14 @@ commands:
     description: "Меню настройки регионов."
     usage: "/regions"
   changeregion:
-    description: Открывает меню списка регионов.
+    description: "Открывает меню списка регионов."
     usage: /changeregion
     permission: RegionModer
   regionpropertiesadmin:
     description: "Открывает свойства указанного города"
     usage: "/regionpropertiesadmin <город>"
+  regionchangeproperties:
+    description: "Изменить свойства региона"
+    usage: /regionchangeproperties <property> <townName>
+    permission: RegionModer
+    permission-message: "У вас нет прав для выполнения этой команды."

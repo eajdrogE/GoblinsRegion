@@ -3,6 +3,7 @@ package Regula.goblinsRegion;
 import Regula.goblinsRegion.commands.DBcommands.FillTownyDb;
 import Regula.goblinsRegion.commands.adminscommands.regions;
 import Regula.goblinsRegion.commands.adminscommands.regionscomands.changeregion;
+import Regula.goblinsRegion.commands.adminscommands.regionscomands.regionchangeproperties;
 import Regula.goblinsRegion.commands.adminscommands.regionscomands.regionpropertiesadmin;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,6 +23,10 @@ public final class GoblinsRegion extends JavaPlugin {
         registerCommand("filltownydb", new FillTownyDb());
         registerCommand("changeregion", new changeregion());
         registerCommand("regionpropertiesadmin", new regionpropertiesadmin(townsDir));
+        this.getCommand("regionchangeproperties").setExecutor(new regionchangeproperties(getDataFolder()));
+
+        // Регистрация слушателя событий
+        getServer().getPluginManager().registerEvents(new regionchangeproperties(getDataFolder()), this);
 
 
         getCommand("changeregion").setExecutor(new changeregion());
