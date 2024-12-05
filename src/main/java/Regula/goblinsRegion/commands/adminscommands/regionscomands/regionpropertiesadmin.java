@@ -131,9 +131,12 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
         // Формирование команды
         String command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
-
-        // Отправка команды игроку для редактирования
         player.closeInventory();
-        player.sendMessage("Вы можете дополнить команду: " + command);
+        String tellrawCommand = String.format(
+                "tellraw %s {\"text\":\"Команда для ввода в терминал: %s\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"%s\"}}",
+                player.getName(), command, command);
+
+// Отправляем команду на выполнение
+        Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), tellrawCommand);
     }
 }
