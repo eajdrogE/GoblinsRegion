@@ -18,19 +18,43 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class regionchangeresources implements CommandExecutor, Listener {
 
     private final List<Resource> resources = new ArrayList<>();
+    private final File townsDir = new File("towny_data/towns");
+    public regionchangeresources(File townsDir) {
+        if (!townsDir.exists()) {
+            townsDir.mkdirs(); // Создаем папку, если она не существует
+        }
+    }
+    private JsonObject loadTownData(String townName) {
+        // Используем переданный путь
+        File townFile = new File(townsDir, townName + ".json");
 
-    public regionchangeresources() {
-        loadResourcesFromJson();
+        // Логируем путь
+        Bukkit.getLogger().info("Путь к файлу города: " + townFile.getAbsolutePath());
+
+        if (!townFile.exists()) {
+            Bukkit.getLogger().warning("Файл города не найден: " + townFile.getAbsolutePath());
+            return null;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(townFile))) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            return JsonParser.parseString(stringBuilder.toString()).getAsJsonObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private void loadResourcesFromJson() {
@@ -180,27 +204,31 @@ public class regionchangeresources implements CommandExecutor, Listener {
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
     }
-    private JsonObject loadTownData(String townName) {
-        File townFile = new File("towny_data/towns", townName + ".json");  // Путь к файлу теперь правильный
-        if (!townFile.exists()) return null;
-
-        try (FileReader reader = new FileReader(townFile)) {
-            return JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+//    private JsonObject loadTownData(String townName) {
+//        File townsDir = new File("towny_data/towns");
+//        File townFile = new File(townsDir, townName + ".json");
+//        if (!townFile.exists()) return null;
+//
+//        try (FileReader reader = new FileReader(townFile)) {
+//            return JsonParser.parseReader(reader).getAsJsonObject();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     private void saveTownData(String townName, JsonObject townData) {
-        File townFile = new File("towny_data/towns", townName + ".json");
+        // Путь к файлу, где будем сохранять данные
+        File townFile = new File(townsDir, townName + ".json");
 
         try (FileWriter writer = new FileWriter(townFile)) {
             writer.write(townData.toString());
+            Bukkit.getLogger().info("Данные города успешно сохранены: " + townFile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     private String extractTownNameFromInventoryTitle(String title) {
         if (title.startsWith("Ресурсы региона: ")) {
             return title.substring("Ресурсы региона: ".length());

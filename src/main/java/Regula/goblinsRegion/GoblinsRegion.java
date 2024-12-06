@@ -20,7 +20,7 @@ public final class GoblinsRegion extends JavaPlugin {
         townsDir = new File(getDataFolder(), "towny_data/towns");
 
         registerCommand("regions", new regions(this));
-        registerCommand("regionchangeresources", new regionchangeresources());
+        registerCommand("regionchangeresources", new regionchangeresources(townsDir));
         getServer().getPluginManager().registerEvents(new changeregion(townsDir), this);
         registerCommand("filltownydb", new FillTownyDb());
         registerCommand("changeregion", new changeregion(townsDir));
@@ -32,7 +32,7 @@ public final class GoblinsRegion extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(townsDir), this);
 
 
-        getServer().getPluginManager().registerEvents(new regionchangeresources(), this);
+        getServer().getPluginManager().registerEvents(new regionchangeresources(townsDir), this);
         getLogger().info("GoblinsRegion плагин успешно включен!");
     }
 
