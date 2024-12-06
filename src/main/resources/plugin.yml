@@ -21,3 +21,6 @@ commands:
     usage: /regionchangeproperties <property> <townName>
     permission: RegionModer
     permission-message: "У вас нет прав для выполнения этой команды."
+  regionchangeresources:
+    description: "Открывает меню ресурсов для города"
+    usage: "/regionchangeresources <город>"

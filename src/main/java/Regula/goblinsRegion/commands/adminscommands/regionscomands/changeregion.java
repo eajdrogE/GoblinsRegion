@@ -24,15 +24,15 @@ import java.io.IOException;
 
 public class changeregion implements CommandExecutor, Listener {
 
-    private final File townsDir;
 
-    public changeregion() {
-        // Статичный путь к папке с данными городов
-        this.townsDir = new File("towny_data/towns"); // Укажите фактический путь
+    private final File townsDir = new File("towny_data/towns");
+
+    public changeregion(File townsDir) {
         if (!townsDir.exists()) {
-            townsDir.mkdirs(); // Создаём папку, если она не существует
+            townsDir.mkdirs(); // Создаем папку, если она не существует
         }
     }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

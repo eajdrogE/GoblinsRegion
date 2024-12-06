@@ -19,12 +19,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 public class regionpropertiesadmin implements CommandExecutor, Listener {
 
     private final File townsDir = new File("towny_data/towns");
 
-    public regionpropertiesadmin(File townsDir) {
+    public regionpropertiesadmin(File serverDirectory) {
         if (!townsDir.exists()) {
             townsDir.mkdirs(); // Создаем папку, если она не существует
         }
@@ -56,46 +57,36 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         return true;
     }
 
-    public void openRegionProperties(Player player, String townName) {
+    private JsonObject loadTownData(String townName) {
         File townFile = new File(townsDir, townName + ".json");
-        if (!townFile.exists()) {
+        if (!townFile.exists()) return null;
+
+        try (FileReader reader = new FileReader(townFile)) {
+            return JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void openRegionProperties(Player player, String townName) {
+        JsonObject townData = loadTownData(townName);
+        if (townData == null) {
             player.sendMessage("Данные о городе " + townName + " не найдены.");
             return;
         }
 
-        JsonObject townData;
-        try (FileReader reader = new FileReader(townFile)) {
-            townData = JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            player.sendMessage("Ошибка чтения данных города.");
-            e.printStackTrace();
-            return;
-        }
-
         Inventory inventory = Bukkit.createInventory(null, 27, "Регион: " + townName);
-        ItemStack infoPaper = new ItemStack(Material.PAPER);
-        ItemMeta paperMeta = infoPaper.getItemMeta();
-        if (paperMeta != null) {
-            paperMeta.setDisplayName("Информация о регионе");
-            StringBuilder loreBuilder = new StringBuilder();
-            loreBuilder.append(ChatColor.YELLOW + "Название: " + ChatColor.WHITE + townData.get("name").getAsString() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Стабильность: " + ChatColor.WHITE + townData.get("stability").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Процветание: " + ChatColor.WHITE + townData.get("prosperity").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Лимит: " + ChatColor.WHITE + townData.get("limit").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Очки пополнения: " + ChatColor.WHITE + townData.get("replenishmentPoints").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Культура: " + ChatColor.WHITE + townData.get("culture").getAsString() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Доступ к морю: " + ChatColor.WHITE + townData.get("hasSeaAccess").getAsBoolean() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Базовая стабильность: " + ChatColor.WHITE + townData.get("baseStability").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Рост стабильности до базовой: " + ChatColor.WHITE + townData.get("stabilityGrowthToBase").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Рост стабильности сверх базовой: " + ChatColor.WHITE + townData.get("stabilityGrowthBeyondBase").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Максимальная стабильность: " + ChatColor.WHITE + townData.get("maxStability").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Рост процветания: " + ChatColor.WHITE + townData.get("prosperityGrowth").getAsInt() + "\n");
-            loreBuilder.append(ChatColor.YELLOW + "Рост лимита: " + ChatColor.WHITE + townData.get("limitGrowth").getAsInt() + "\n");
-            paperMeta.setLore(loreBuilder.toString().lines().toList());
-            infoPaper.setItemMeta(paperMeta);
-        }
-        inventory.setItem(0, infoPaper);
-        // Заполнение инвентаря
+
+        // Добавляем данные в инвентарь
+        addBasicPropertyItems(inventory, townData);
+        addSpecialPropertyItems(inventory, townData, townName);
+
+        player.openInventory(inventory);
+    }
+
+    private void addBasicPropertyItems(Inventory inventory, JsonObject townData) {
+        addPropertyToInventory(inventory, 0, Material.PAPER, "Информация о регионе", formatTownInfo(townData));
         addPropertyToInventory(inventory, 1, Material.PAPER, "name", townData.get("name").getAsString());
         addPropertyToInventory(inventory, 2, Material.ANVIL, "stability", String.valueOf(townData.get("stability").getAsInt()));
         addPropertyToInventory(inventory, 3, Material.GOLD_INGOT, "prosperity", String.valueOf(townData.get("prosperity").getAsInt()));
@@ -109,19 +100,56 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         addPropertyToInventory(inventory, 11, Material.EMERALD, "maxStability", String.valueOf(townData.get("maxStability").getAsInt()));
         addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "prosperityGrowth", String.valueOf(townData.get("prosperityGrowth").getAsInt()));
         addPropertyToInventory(inventory, 13, Material.IRON_BLOCK, "limitGrowth", String.valueOf(townData.get("limitGrowth").getAsInt()));
-        addPropertyToInventory(inventory, 14, Material.CHEST, "resources", townData.get("resources").toString());
-
-        // Добавление материала меню (menuMaterial)
-        Material menuMaterial = Material.valueOf(townData.get("menuMaterial").getAsString().toUpperCase());
-        addPropertyToInventory(inventory, 15, menuMaterial, "menuMaterial", townData.get("menuMaterial").getAsString());
-        player.openInventory(inventory);
     }
 
-    private void addPropertyToInventory(Inventory inventory, int slot, Material material, String propertyName, String value) {
+    private void addSpecialPropertyItems(Inventory inventory, JsonObject townData, String townName) {
+        addPropertyToInventory(inventory, 14, Material.CHEST, "resources", "Выберите для управления");
+        Material menuMaterial = Material.valueOf(townData.get("menuMaterial").getAsString().toUpperCase());
+        addPropertyToInventory(inventory, 15, menuMaterial, "menuMaterial", "Выберите для управления");
+        addPropertyToInventory(inventory, 16, Material.BRICKS, "buildings", "Выберите для управления");
+    }
+
+    private String formatTownInfo(JsonObject townData) {
+        StringBuilder info = new StringBuilder();
+
+        info.append(ChatColor.YELLOW).append("Название: ").append(ChatColor.WHITE)
+                .append(townData.get("name").getAsString()).append("\n");
+        info.append(ChatColor.YELLOW).append("Стабильность: ").append(ChatColor.WHITE)
+                .append(townData.get("stability").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Процветание: ").append(ChatColor.WHITE)
+                .append(townData.get("prosperity").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Лимит: ").append(ChatColor.WHITE)
+                .append(townData.get("limit").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Очки пополнения: ").append(ChatColor.WHITE)
+                .append(townData.get("replenishmentPoints").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Культура: ").append(ChatColor.WHITE)
+                .append(townData.get("culture").getAsString()).append("\n");
+        info.append(ChatColor.YELLOW).append("Доступ к морю: ").append(ChatColor.WHITE)
+                .append(townData.get("hasSeaAccess").getAsBoolean() ? "Да" : "Нет").append("\n");
+        info.append(ChatColor.YELLOW).append("Базовая стабильность: ").append(ChatColor.WHITE)
+                .append(townData.get("baseStability").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост стабильности к базовой: ").append(ChatColor.WHITE)
+                .append(townData.get("stabilityGrowthToBase").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост стабильности за пределами базовой: ").append(ChatColor.WHITE)
+                .append(townData.get("stabilityGrowthBeyondBase").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Максимальная стабильность: ").append(ChatColor.WHITE)
+                .append(townData.get("maxStability").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост процветания: ").append(ChatColor.WHITE)
+                .append(townData.get("prosperityGrowth").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост лимита: ").append(ChatColor.WHITE)
+                .append(townData.get("limitGrowth").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Материал меню: ").append(ChatColor.WHITE)
+                .append(townData.get("menuMaterial").getAsString().toUpperCase());
+
+        return info.toString();
+    }
+
+    private void addPropertyToInventory(Inventory inventory, int slot, Material material, String displayName, String lore) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(propertyName + ": " + value);
+            meta.setDisplayName(displayName);
+            meta.setLore(List.of(lore.split("\n")));
             item.setItemMeta(meta);
         }
         inventory.setItem(slot, item);
@@ -132,34 +160,30 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         String title = event.getView().getTitle();
         if (!title.startsWith("Регион: ")) return;
 
-        event.setCancelled(true); // Запретить взаимодействие
+        event.setCancelled(true);
 
-        if (event.getCurrentItem() == null || event.getCurrentItem().getType() == Material.AIR) return;
-
-        String townName = title.substring("Регион: ".length()); // Извлекаем имя города из названия сундука
-        int slot = event.getRawSlot(); // Получение слота
-        if (slot == 0) return; // Игнорируем первый слот
+        ItemStack clickedItem = event.getCurrentItem();
+        if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
         Player player = (Player) event.getWhoClicked();
-        ItemStack clickedItem = event.getCurrentItem();
-        String itemName = clickedItem.getItemMeta().getDisplayName();
-
-        // Получение названия редактируемого параметра
-        String[] parts = itemName.split(": ");
-        if (parts.length < 2) return;
-
-        String propertyName = parts[0]; // Название параметра
-
-
-        String command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
-        if (itemName.startsWith("resources"))
-
-            command = "/regionchangeresources "+ "\"" + townName + "\"";
-// Закрываем инвентарь
-            player.closeInventory();
-
-// Вставляем команду в чат (как если бы игрок её сам ввёл)
-            player.chat(command);
-        }
+        String townName = title.substring("Регион: ".length());
+        handlePropertySelection(player, clickedItem, townName);
     }
 
+    private void handlePropertySelection(Player player, ItemStack clickedItem, String townName) {
+        String itemName = clickedItem.getItemMeta().getDisplayName();
+        String command;
+
+        if (itemName.equals("resources")) {
+            command = "/regionchangeresources \"" + townName + "\"";
+        } else if (itemName.equals("buildings")) {
+            command = "/regionchangebuildings \"" + townName + "\"";
+        } else {
+            String propertyName = itemName.split(": ")[0];
+            command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
+        }
+
+        player.closeInventory();
+        player.chat(command);
+    }
+}
