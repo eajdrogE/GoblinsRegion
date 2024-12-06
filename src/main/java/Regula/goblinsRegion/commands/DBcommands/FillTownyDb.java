@@ -1,9 +1,6 @@
 package Regula.goblinsRegion.commands.DBcommands;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
@@ -12,24 +9,41 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.TownyUniverse;
 import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Town;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Random;
 
 public class FillTownyDb implements CommandExecutor {
 
+    private final JsonArray availableResources = new JsonArray();
+    private final Random random = new Random();
+
+    public FillTownyDb() {
+        loadResources();
+    }
+
+    private void loadResources() {
+        try (FileReader reader = new FileReader("towny_data/resources.json")) {
+            JsonObject resourceData = JsonParser.parseReader(reader).getAsJsonObject();
+            availableResources.addAll(resourceData.getAsJsonArray("resources"));
+        } catch (IOException e) {
+            Bukkit.getLogger().severe("Не удалось загрузить доступные ресурсы: " + e.getMessage());
+        }
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-//        if (!(sender instanceof Player)) {
-//            sender.sendMessage("Команду может выполнять только игрок.");
-//            return true;
-//        }
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Команду может выполнять только игрок.");
+            return true;
+        }
 
         Player player = (Player) sender;
 
@@ -60,7 +74,7 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("limit", 1);
             townJson.addProperty("replenishmentPoints", 0);
             townJson.addProperty("culture", "Default Culture");
-            townJson.add("resources", new JsonArray()); // пустой список ресурсов
+            townJson.add("resources", generateTownResources());
             townJson.addProperty("hasSeaAccess", false);
             townJson.addProperty("baseStability", 10);
             townJson.addProperty("stabilityGrowthToBase", 1);
@@ -112,5 +126,19 @@ public class FillTownyDb implements CommandExecutor {
 
         player.sendMessage("Данные городов и наций успешно сохранены.");
         return true;
+    }
+
+    private JsonArray generateTownResources() {
+        JsonArray resources = new JsonArray();
+
+        for (int i = 0; i < availableResources.size(); i++) {
+            JsonObject resource = availableResources.get(i).getAsJsonObject();
+            JsonObject townResource = new JsonObject();
+            townResource.addProperty("name", resource.get("name").getAsString());
+            townResource.addProperty("amount", 0); // Случайное количество от 10 до 59
+            resources.add(townResource);
+        }
+
+        return resources;
     }
 }

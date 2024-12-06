@@ -1,5 +1,6 @@
 package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 
+import Regula.goblinsRegion.GoblinsRegion;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,7 +18,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +34,7 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void loadResourcesFromJson() {
-        try (FileReader reader = new FileReader("resources.json")) {
+        try (FileReader reader = new FileReader("towny_data/resources.json")) {
             JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray resourceArray = jsonObject.getAsJsonArray("resources");
 
@@ -72,30 +75,49 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void openResourcesMenu(Player player, String townName) {
+        JsonObject townData = loadTownData(townName);
+        if (townData == null) {
+            player.sendMessage(ChatColor.RED + "Данные о городе " + townName + " не найдены.");
+            return;
+        }
+
+        JsonArray resourceArray = townData.getAsJsonArray("resources");
         Inventory inventory = Bukkit.createInventory(null, 54, "Ресурсы региона: " + townName);
 
         int slot = 0;
         for (Resource resource : resources) {
-            addResourcePair(inventory, slot, resource);
+            int resourceAmount = getResourceAmount(resourceArray, resource.name);
+            addResourcePair(inventory, slot, resource, resourceAmount);
             slot += 2; // Каждая пара занимает два слота
         }
 
         player.openInventory(inventory);
     }
 
-    private void addResourcePair(Inventory inventory, int startSlot, Resource resource) {
-        ItemStack addItem = createResourceItem(resource.material, resource.name, "Добавить");
-        ItemStack removeItem = createResourceItem(resource.material, resource.name, "Удалить");
+    private int getResourceAmount(JsonArray resourceArray, String resourceName) {
+        for (int i = 0; i < resourceArray.size(); i++) {
+            JsonObject resource = resourceArray.get(i).getAsJsonObject();
+            if (resource.get("name").getAsString().equals(resourceName)) {
+                return resource.get("amount").getAsInt();
+            }
+        }
+        return 0; // Если ресурс не найден, возвращаем 0
+    }
+
+    private void addResourcePair(Inventory inventory, int startSlot, Resource resource, int amount) {
+        ItemStack addItem = createResourceItem(resource.material, resource.name, "Добавить", amount);
+        ItemStack removeItem = createResourceItem(resource.material, resource.name, "Удалить", amount);
 
         inventory.setItem(startSlot, addItem);
         inventory.setItem(startSlot + 1, removeItem);
     }
 
-    private ItemStack createResourceItem(Material material, String resourceName, String action) {
+
+    private ItemStack createResourceItem(Material material, String resourceName, String action, int amount) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.YELLOW + resourceName);
+            meta.setDisplayName(ChatColor.YELLOW + resourceName + " (" + amount + ")");
             meta.setLore(List.of(ChatColor.GREEN + action));
             item.setItemMeta(meta);
         }
@@ -120,13 +142,70 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void handleResourceAction(Player player, String resourceName, String action) {
-        String message = action.equals(ChatColor.GREEN + "Добавить")
-                ? "Вы добавили ресурс: " + resourceName
-                : "Вы удалили ресурс: " + resourceName;
+        String townName = extractTownNameFromInventoryTitle(player.getOpenInventory().getTitle());
+        if (townName == null) {
+            player.sendMessage(ChatColor.RED + "Не удалось определить город.");
+            return;
+        }
 
-        player.sendMessage(ChatColor.AQUA + message);
+        JsonObject townData = loadTownData(townName);
+        if (townData == null) {
+            player.sendMessage(ChatColor.RED + "Данные о городе не найдены.");
+            return;
+        }
 
-        // Здесь можно добавить логику для изменения ресурсов региона в данных.
+        JsonArray resourceArray = townData.getAsJsonArray("resources");
+        boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1);
+
+        if (updated) {
+            saveTownData(townName, townData);
+            player.sendMessage(ChatColor.AQUA + "Ресурс \"" + resourceName + "\" успешно обновлён.");
+            reopenResourcesMenu(player, townName);
+        } else {
+            player.sendMessage(ChatColor.RED + "Ресурс \"" + resourceName + "\" не найден.");
+        }
+    }
+    private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta) {
+        for (int i = 0; i < resourceArray.size(); i++) {
+            JsonObject resource = resourceArray.get(i).getAsJsonObject();
+            if (resource.get("name").getAsString().equals(resourceName)) {
+                int currentAmount = resource.get("amount").getAsInt();
+                int newAmount = Math.max(currentAmount + delta, 0); // Гарантируем, что количество не станет отрицательным
+                resource.addProperty("amount", newAmount);
+                return true;
+            }
+        }
+        return false; // Если ресурс не найден
+    }
+    private void reopenResourcesMenu(Player player, String townName) {
+        openResourcesMenu(player, townName);
+    }
+    private JsonObject loadTownData(String townName) {
+        File townFile = new File("towny_data/towns", townName + ".json");  // Путь к файлу теперь правильный
+        if (!townFile.exists()) return null;
+
+        try (FileReader reader = new FileReader(townFile)) {
+            return JsonParser.parseReader(reader).getAsJsonObject();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void saveTownData(String townName, JsonObject townData) {
+        File townFile = new File("towny_data/towns", townName + ".json");
+
+        try (FileWriter writer = new FileWriter(townFile)) {
+            writer.write(townData.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private String extractTownNameFromInventoryTitle(String title) {
+        if (title.startsWith("Ресурсы региона: ")) {
+            return title.substring("Ресурсы региона: ".length());
+        }
+        return null;
     }
 
     private static class Resource {
