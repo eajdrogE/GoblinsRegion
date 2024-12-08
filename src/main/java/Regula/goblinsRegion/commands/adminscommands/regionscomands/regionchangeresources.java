@@ -3,7 +3,6 @@ package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 import Regula.goblinsRegion.GoblinsRegion;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -17,61 +16,35 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import Regula.goblinsRegion.commands.DBcommands.TownsDataHandler;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class regionchangeresources implements CommandExecutor, Listener {
 
     private final List<Resource> resources = new ArrayList<>();
-    private final File townsDir = new File("towny_data/towns");
-    public regionchangeresources(File townsDir) {
-        if (!townsDir.exists()) {
-            townsDir.mkdirs(); // Создаем папку, если она не существует
-        }
-    }
-    private JsonObject loadTownData(String townName) {
-        // Используем переданный путь
-        File townFile = new File(townsDir, townName + ".json");
 
-        // Логируем путь
-        Bukkit.getLogger().info("Путь к файлу города: " + townFile.getAbsolutePath());
-
-        if (!townFile.exists()) {
-            Bukkit.getLogger().warning("Файл города не найден: " + townFile.getAbsolutePath());
-            return null;
-        }
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(townFile))) {
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line);
-            }
-
-            return JsonParser.parseString(stringBuilder.toString()).getAsJsonObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private void loadResourcesFromJson() {
-        try (FileReader reader = new FileReader("towny_data/resources.json")) {
-            JsonObject jsonObject = JsonParser.parseReader(reader).getAsJsonObject();
-            JsonArray resourceArray = jsonObject.getAsJsonArray("resources");
-
+    public regionchangeresources() {
+        // Загружаем список ресурсов из resources.json
+        JsonObject resourcesData = TownsDataHandler.getResourcesList();
+        if (resourcesData != null && resourcesData.has("resources")) {
+            JsonArray resourceArray = resourcesData.getAsJsonArray("resources");
             for (int i = 0; i < resourceArray.size(); i++) {
-                JsonObject resourceObj = resourceArray.get(i).getAsJsonObject();
-                String name = resourceObj.get("name").getAsString();
-                Material material = Material.valueOf(resourceObj.get("material").getAsString().toUpperCase());
-
-                resources.add(new Resource(name, material));
+                JsonObject resourceJson = resourceArray.get(i).getAsJsonObject();
+                String resourceName = resourceJson.get("name").getAsString();
+                String materialName = resourceJson.get("material").getAsString();
+                Material material = Material.getMaterial(materialName); // Преобразуем строку в Material
+                if (material != null) {
+                    resources.add(new Resource(resourceName, material));
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+    }
+
+    private JsonObject loadTownData(String townName) {
+        // Используем TownsDataHandler для загрузки данных города
+        return TownsDataHandler.getRegionResources(townName);
     }
 
     @Override
@@ -99,7 +72,7 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void openResourcesMenu(Player player, String townName) {
-        JsonObject townData = loadTownData(townName);
+        JsonObject townData = TownsDataHandler.getRegionData(townName);
         if (townData == null) {
             player.sendMessage(ChatColor.RED + "Данные о городе " + townName + " не найдены.");
             return;
@@ -135,7 +108,6 @@ public class regionchangeresources implements CommandExecutor, Listener {
         inventory.setItem(startSlot, addItem);
         inventory.setItem(startSlot + 1, removeItem);
     }
-
 
     private ItemStack createResourceItem(Material material, String resourceName, String action, int amount) {
         ItemStack item = new ItemStack(material);
@@ -182,13 +154,15 @@ public class regionchangeresources implements CommandExecutor, Listener {
         boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1);
 
         if (updated) {
-            saveTownData(townName, townData);
+            // Сохраняем обновлённые данные о ресурсе
+            saveCityResources(townName, townData);
             player.sendMessage(ChatColor.AQUA + "Ресурс \"" + resourceName + "\" успешно обновлён.");
             reopenResourcesMenu(player, townName);
         } else {
             player.sendMessage(ChatColor.RED + "Ресурс \"" + resourceName + "\" не найден.");
         }
     }
+
     private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta) {
         for (int i = 0; i < resourceArray.size(); i++) {
             JsonObject resource = resourceArray.get(i).getAsJsonObject();
@@ -201,32 +175,9 @@ public class regionchangeresources implements CommandExecutor, Listener {
         }
         return false; // Если ресурс не найден
     }
+
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
-    }
-//    private JsonObject loadTownData(String townName) {
-//        File townsDir = new File("towny_data/towns");
-//        File townFile = new File(townsDir, townName + ".json");
-//        if (!townFile.exists()) return null;
-//
-//        try (FileReader reader = new FileReader(townFile)) {
-//            return JsonParser.parseReader(reader).getAsJsonObject();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-
-    private void saveTownData(String townName, JsonObject townData) {
-        // Путь к файлу, где будем сохранять данные
-        File townFile = new File(townsDir, townName + ".json");
-
-        try (FileWriter writer = new FileWriter(townFile)) {
-            writer.write(townData.toString());
-            Bukkit.getLogger().info("Данные города успешно сохранены: " + townFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private String extractTownNameFromInventoryTitle(String title) {
@@ -234,6 +185,11 @@ public class regionchangeresources implements CommandExecutor, Listener {
             return title.substring("Ресурсы региона: ".length());
         }
         return null;
+    }
+
+    private void saveCityResources(String townName, JsonObject townData) {
+        // Сохраняем обновленные ресурсы города
+        TownsDataHandler.saveCityResources(townData, TownsDataHandler.formatCityName(townName));
     }
 
     private static class Resource {

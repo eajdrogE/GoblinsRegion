@@ -68,13 +68,12 @@ public class FillTownyDb implements CommandExecutor {
         Collection<Town> towns = TownyUniverse.getInstance().getTowns();
         for (Town town : towns) {
             JsonObject townJson = new JsonObject();
-            townJson.addProperty("name", town.getName());
+            townJson.addProperty("name", TownsDataHandler.formatCityName(town.getName()));
             townJson.addProperty("stability", 10);
             townJson.addProperty("prosperity", 200);
             townJson.addProperty("limit", 1);
             townJson.addProperty("replenishmentPoints", 0);
             townJson.addProperty("culture", "Default Culture");
-            townJson.add("resources", generateTownResources());
             townJson.addProperty("hasSeaAccess", false);
             townJson.addProperty("baseStability", 10);
             townJson.addProperty("stabilityGrowthToBase", 1);
@@ -83,19 +82,26 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("prosperityGrowth", 0);
             townJson.addProperty("limitGrowth", 0);
             townJson.addProperty("menuMaterial", "PAPER");
-            try (FileWriter writer = new FileWriter(new File(townsDir, town.getName() + ".json"))) {
+
+            // Запись основных данных города в папку towny_data/towns
+            try (FileWriter writer = new FileWriter(new File(townsDir, TownsDataHandler.formatCityName(town.getName()) + ".json"))) {
                 gson.toJson(townJson, writer);
             } catch (IOException e) {
-                player.sendMessage("Ошибка записи данных города: " + town.getName());
+                player.sendMessage("Ошибка записи данных города: " + TownsDataHandler.formatCityName(town.getName()));
                 e.printStackTrace();
             }
+
+            // Запись ресурсов города в папку towny_data/towns_resources
+            JsonObject townResourcesJson = new JsonObject();
+            townResourcesJson.add("resources", getRegionResources(town.getName()));
+            TownsDataHandler.saveCityResources(townResourcesJson, town.getName());
         }
 
         // Обработка наций
         Collection<Nation> nations = TownyUniverse.getInstance().getNations();
         for (Nation nation : nations) {
             JsonObject nationJson = new JsonObject();
-            nationJson.addProperty("name", nation.getName());
+            nationJson.addProperty("name", TownsDataHandler.formatCityName(nation.getName()));
             nationJson.addProperty("income", 0);
             nationJson.addProperty("limit", 0);
             nationJson.addProperty("attackLimit", 0);
@@ -116,7 +122,9 @@ public class FillTownyDb implements CommandExecutor {
             nationJson.addProperty("rulerAge", 30);
             nationJson.addProperty("rulerRace", "Default Race");
             nationJson.addProperty("menuMaterial", "PAPER");
-            try (FileWriter writer = new FileWriter(new File(nationsDir, nation.getName() + ".json"))) {
+
+            // Запись данных нации в папку towny_data/nations
+            try (FileWriter writer = new FileWriter(new File(nationsDir, TownsDataHandler.formatCityName(nation.getName()) + ".json"))) {
                 gson.toJson(nationJson, writer);
             } catch (IOException e) {
                 player.sendMessage("Ошибка записи данных нации: " + nation.getName());
@@ -136,6 +144,21 @@ public class FillTownyDb implements CommandExecutor {
             JsonObject townResource = new JsonObject();
             townResource.addProperty("name", resource.get("name").getAsString());
             townResource.addProperty("amount", 0); // Случайное количество от 10 до 59
+            resources.add(townResource);
+        }
+
+        return resources;
+    }
+
+    private JsonArray getRegionResources(String cityName) {
+        JsonArray resources = new JsonArray();
+
+        // Заполнение ресурсов для города на основе данных из resources.json
+        for (int i = 0; i < availableResources.size(); i++) {
+            JsonObject resource = availableResources.get(i).getAsJsonObject();
+            JsonObject townResource = new JsonObject();
+            townResource.addProperty("name", resource.get("name").getAsString());
+            townResource.addProperty("material", resource.get("material").getAsString());
             resources.add(townResource);
         }
 

@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'Regula'
@@ -25,7 +26,8 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     compileOnly("com.github.TownyAdvanced:Towny:0.100.4.0") // Укажите актуальную версию Towny
     compileOnly("net.luckperms:api:5.4") // LuckPerms API
-    implementation("org.mongodb:mongodb-driver-sync:4.11.0") // MongoDB Driver
+    implementation 'org.mongodb:mongodb-driver-sync:4.9.0'
+    // MongoDB Driver
 }
 
 def targetJavaVersion = 21
@@ -53,4 +55,8 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+}
+shadowJar {
+    archiveClassifier.set('')
+    configurations = [project.configurations.runtimeClasspath]
 }

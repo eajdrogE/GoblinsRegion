@@ -1,7 +1,6 @@
 package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -10,29 +9,20 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import Regula.goblinsRegion.commands.DBcommands.TownsDataHandler;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 
 public class changeregion implements CommandExecutor, Listener {
 
-
-    private final File townsDir = new File("towny_data/towns");
-
-    public changeregion(File townsDir) {
-        if (!townsDir.exists()) {
-            townsDir.mkdirs(); // Создаем папку, если она не существует
-        }
+    public changeregion() {
+        // Конструктор без townsDir, используем методы из TownsDataHandler
     }
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -53,6 +43,7 @@ public class changeregion implements CommandExecutor, Listener {
     }
 
     public void openRegionList(Player player, int page) {
+        File townsDir = new File("towny_data/towns");
         if (!townsDir.exists() || !townsDir.isDirectory()) {
             player.sendMessage("Папка с данными городов не найдена.");
             return;
@@ -70,36 +61,39 @@ public class changeregion implements CommandExecutor, Listener {
 
         Inventory inventory = Bukkit.createInventory(null, 54, ChatColor.DARK_GREEN + "RegionList");
 
-
-        JsonParser parser = new JsonParser();
+        JsonObject townJson;
         int start = page * townsPerPage; // Индекс начала текущей страницы
         int end = Math.min(start + townsPerPage, townFiles.length); // Индекс конца текущей страницы
 
         for (int i = start; i < end; i++) {
             File townFile = townFiles[i];
-            try (FileReader reader = new FileReader(townFile)) {
-                JsonObject townJson = parser.parse(reader).getAsJsonObject();
 
-                String townName = townJson.has("name") ? townJson.get("name").getAsString() : "Неизвестный город";
-                String materialName = townJson.has("menuMaterial") ? townJson.get("menuMaterial").getAsString() : "PAPER";
-                Material menuMaterial = Material.matchMaterial(materialName.toUpperCase());
+            // Форматируем имя города с помощью formatCityName
+            String formattedTownName = TownsDataHandler.formatCityName(townFile.getName().replace(".json", ""));
 
-                if (menuMaterial == null) {
-                    menuMaterial = Material.PAPER;
-                }
-
-                ItemStack itemStack = new ItemStack(menuMaterial);
-                ItemMeta meta = itemStack.getItemMeta();
-                if (meta != null) {
-                    meta.setDisplayName(townName);
-                    itemStack.setItemMeta(meta);
-                }
-
-                inventory.addItem(itemStack);
-            } catch (IOException e) {
-                player.sendMessage("Ошибка чтения данных города: " + townFile.getName());
-                e.printStackTrace();
+            // Получаем данные о городе с помощью TownsDataHandler
+            townJson = TownsDataHandler.getRegionData(formattedTownName);
+            if (townJson == null) {
+                player.sendMessage("Ошибка загрузки данных для города: " + townFile.getName());
+                continue;
             }
+
+            String townName = townJson.has("name") ? townJson.get("name").getAsString() : "Неизвестный город";
+            String materialName = townJson.has("menuMaterial") ? townJson.get("menuMaterial").getAsString() : "PAPER";
+            Material menuMaterial = Material.matchMaterial(materialName.toUpperCase());
+
+            if (menuMaterial == null) {
+                menuMaterial = Material.PAPER;
+            }
+
+            ItemStack itemStack = new ItemStack(menuMaterial);
+            ItemMeta meta = itemStack.getItemMeta();
+            if (meta != null) {
+                meta.setDisplayName(townName);
+                itemStack.setItemMeta(meta);
+            }
+
+            inventory.addItem(itemStack);
         }
 
         // Добавление стрелок навигации
@@ -169,7 +163,4 @@ public class changeregion implements CommandExecutor, Listener {
             }
         }
     }
-
-
 }
-

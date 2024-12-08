@@ -15,24 +15,26 @@ public final class GoblinsRegion extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Создание директории для towny_data, если она не существует
+        File townsDir = new File(getDataFolder(), "towny_data");
+        if (!townsDir.exists()) {
+            townsDir.mkdirs(); // Создаем папку, если её нет
+        }
+
         // Регистрация команд
-        File townsDir = null;
-        townsDir = new File(getDataFolder(), "towny_data/towns");
-
         registerCommand("regions", new regions(this));
-        registerCommand("regionchangeresources", new regionchangeresources(townsDir));
-        getServer().getPluginManager().registerEvents(new changeregion(townsDir), this);
+        registerCommand("regionchangeresources", new regionchangeresources());
+        getServer().getPluginManager().registerEvents(new changeregion(), this);
         registerCommand("filltownydb", new FillTownyDb());
-        registerCommand("changeregion", new changeregion(townsDir));
-        registerCommand("regionpropertiesadmin", new regionpropertiesadmin(townsDir));
-        registerCommand("regionchangeproperties", new regionchangeproperties(townsDir));
-        getCommand("regionchangeproperties").setExecutor(new regionchangeproperties(townsDir));
-        getCommand("changeregion").setExecutor(new changeregion(townsDir));
-        getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin(townsDir));
-        getServer().getPluginManager().registerEvents(new regionpropertiesadmin(townsDir), this);
+        registerCommand("changeregion", new changeregion());
+        registerCommand("regionpropertiesadmin", new regionpropertiesadmin());
+        registerCommand("regionchangeproperties", new regionchangeproperties());
+        getCommand("regionchangeproperties").setExecutor(new regionchangeproperties());
+        getCommand("changeregion").setExecutor(new changeregion());
+        getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin());
+        getServer().getPluginManager().registerEvents(new regionpropertiesadmin(), this);
 
-
-        getServer().getPluginManager().registerEvents(new regionchangeresources(townsDir), this);
+        getServer().getPluginManager().registerEvents(new regionchangeresources(), this);
         getLogger().info("GoblinsRegion плагин успешно включен!");
     }
 

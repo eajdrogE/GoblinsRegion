@@ -1,7 +1,7 @@
 package Regula.goblinsRegion.commands.adminscommands.regionscomands;
 
+import Regula.goblinsRegion.commands.DBcommands.TownsDataHandler;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -16,20 +16,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
 
 public class regionpropertiesadmin implements CommandExecutor, Listener {
-
-    private final File townsDir = new File("towny_data/towns");
-
-    public regionpropertiesadmin(File serverDirectory) {
-        if (!townsDir.exists()) {
-            townsDir.mkdirs(); // Создаем папку, если она не существует
-        }
-    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -58,15 +47,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
     }
 
     private JsonObject loadTownData(String townName) {
-        File townFile = new File(townsDir, townName + ".json");
-        if (!townFile.exists()) return null;
-
-        try (FileReader reader = new FileReader(townFile)) {
-            return JsonParser.parseReader(reader).getAsJsonObject();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return TownsDataHandler.getRegionData(townName);
     }
 
     private void openRegionProperties(Player player, String townName) {
@@ -167,7 +148,7 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
         Player player = (Player) event.getWhoClicked();
         String townName = title.substring("Регион: ".length());
-        handlePropertySelection(player, clickedItem, townName);
+        handlePropertySelection(player, clickedItem, TownsDataHandler.formatCityName(townName));
     }
 
     private void handlePropertySelection(Player player, ItemStack clickedItem, String townName) {
@@ -175,12 +156,12 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         String command;
 
         if (itemName.equals("resources")) {
-            command = "/regionchangeresources \"" + townName + "\"";
+            command = "/regionchangeresources " + townName + "";
         } else if (itemName.equals("buildings")) {
-            command = "/regionchangebuildings \"" + townName + "\"";
+            command = "/regionchangebuildings " + townName + "";
         } else {
             String propertyName = itemName.split(": ")[0];
-            command = "/regionchangeproperties " + propertyName + " \"" + townName + "\"";
+            command = "/regionchangeproperties " + propertyName  +" "+ townName;
         }
 
         player.closeInventory();
