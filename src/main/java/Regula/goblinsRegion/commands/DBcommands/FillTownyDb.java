@@ -136,20 +136,6 @@ public class FillTownyDb implements CommandExecutor {
         return true;
     }
 
-    private JsonArray generateTownResources() {
-        JsonArray resources = new JsonArray();
-
-        for (int i = 0; i < availableResources.size(); i++) {
-            JsonObject resource = availableResources.get(i).getAsJsonObject();
-            JsonObject townResource = new JsonObject();
-            townResource.addProperty("name", resource.get("name").getAsString());
-            townResource.addProperty("amount", 0); // Случайное количество от 10 до 59
-            resources.add(townResource);
-        }
-
-        return resources;
-    }
-
     private JsonArray getRegionResources(String cityName) {
         JsonArray resources = new JsonArray();
 
@@ -159,9 +145,16 @@ public class FillTownyDb implements CommandExecutor {
             JsonObject townResource = new JsonObject();
             townResource.addProperty("name", resource.get("name").getAsString());
             townResource.addProperty("material", resource.get("material").getAsString());
+
+            // Добавление случайного количества ресурсов для города
+            int randomAmount = 0;
+            townResource.addProperty("amount", randomAmount);
+
             resources.add(townResource);
         }
 
         return resources;
     }
+
+
 }

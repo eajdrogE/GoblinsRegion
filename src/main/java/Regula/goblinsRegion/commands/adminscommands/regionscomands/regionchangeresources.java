@@ -30,13 +30,15 @@ public class regionchangeresources implements CommandExecutor, Listener {
         JsonObject resourcesData = TownsDataHandler.getResourcesList();
         if (resourcesData != null && resourcesData.has("resources")) {
             JsonArray resourceArray = resourcesData.getAsJsonArray("resources");
-            for (int i = 0; i < resourceArray.size(); i++) {
-                JsonObject resourceJson = resourceArray.get(i).getAsJsonObject();
-                String resourceName = resourceJson.get("name").getAsString();
-                String materialName = resourceJson.get("material").getAsString();
-                Material material = Material.getMaterial(materialName); // Преобразуем строку в Material
-                if (material != null) {
-                    resources.add(new Resource(resourceName, material));
+            if (resourceArray != null) { // Проверка на null
+                for (int i = 0; i < resourceArray.size(); i++) {
+                    JsonObject resourceJson = resourceArray.get(i).getAsJsonObject();
+                    String resourceName = resourceJson.get("name").getAsString();
+                    String materialName = resourceJson.get("material").getAsString();
+                    Material material = Material.getMaterial(materialName); // Преобразуем строку в Material
+                    if (material != null) {
+                        resources.add(new Resource(resourceName, material));
+                    }
                 }
             }
         }
@@ -79,6 +81,11 @@ public class regionchangeresources implements CommandExecutor, Listener {
         }
 
         JsonArray resourceArray = townData.getAsJsonArray("resources");
+        if (resourceArray == null) {
+            player.sendMessage(ChatColor.RED + "Ресурсы для города " + townName + " не найдены.");
+            return;
+        }
+
         Inventory inventory = Bukkit.createInventory(null, 54, "Ресурсы региона: " + townName);
 
         int slot = 0;
@@ -92,10 +99,12 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private int getResourceAmount(JsonArray resourceArray, String resourceName) {
-        for (int i = 0; i < resourceArray.size(); i++) {
-            JsonObject resource = resourceArray.get(i).getAsJsonObject();
-            if (resource.get("name").getAsString().equals(resourceName)) {
-                return resource.get("amount").getAsInt();
+        if (resourceArray != null) {
+            for (int i = 0; i < resourceArray.size(); i++) {
+                JsonObject resource = resourceArray.get(i).getAsJsonObject();
+                if (resource.get("name").getAsString().equals(resourceName)) {
+                    return resource.get("amount").getAsInt();
+                }
             }
         }
         return 0; // Если ресурс не найден, возвращаем 0
@@ -151,6 +160,11 @@ public class regionchangeresources implements CommandExecutor, Listener {
         }
 
         JsonArray resourceArray = townData.getAsJsonArray("resources");
+        if (resourceArray == null) {
+            player.sendMessage(ChatColor.RED + "Ресурсы для города не найдены.");
+            return;
+        }
+
         boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1);
 
         if (updated) {
@@ -164,13 +178,15 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta) {
-        for (int i = 0; i < resourceArray.size(); i++) {
-            JsonObject resource = resourceArray.get(i).getAsJsonObject();
-            if (resource.get("name").getAsString().equals(resourceName)) {
-                int currentAmount = resource.get("amount").getAsInt();
-                int newAmount = Math.max(currentAmount + delta, 0); // Гарантируем, что количество не станет отрицательным
-                resource.addProperty("amount", newAmount);
-                return true;
+        if (resourceArray != null) {
+            for (int i = 0; i < resourceArray.size(); i++) {
+                JsonObject resource = resourceArray.get(i).getAsJsonObject();
+                if (resource.get("name").getAsString().equals(resourceName)) {
+                    int currentAmount = resource.get("amount").getAsInt();
+                    int newAmount = Math.max(currentAmount + delta, 0); // Гарантируем, что количество не станет отрицательным
+                    resource.addProperty("amount", newAmount);
+                    return true;
+                }
             }
         }
         return false; // Если ресурс не найден
