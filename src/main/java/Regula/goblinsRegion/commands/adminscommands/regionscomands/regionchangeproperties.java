@@ -27,20 +27,28 @@ public class regionchangeproperties implements CommandExecutor {
         Player player = (Player) sender;
 
         if (args.length < 2) {
-            player.sendMessage("Использование: /regionchangeproperties <property> <townName>");
+            player.sendMessage("Использование: /regionchangeproperties <property> <townName> <newTownName...>");
             return true;
         }
 
         String propertyName = args[0]; // Имя свойства
-        String townName = args[1];
+        String townName = args[1]; // Старое имя города
+        String newTownName = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)); // Новое имя города
 
         // Убираем кавычки, если они есть в начале и конце строки
         if (townName.startsWith("\"") && townName.endsWith("\"")) {
             townName = townName.substring(1, townName.length() - 1);  // Удаляем кавычки
         }
+        if (newTownName.startsWith("\"") && newTownName.endsWith("\"")) {
+            newTownName = newTownName.substring(1, newTownName.length() - 1);  // Удаляем кавычки
+        }
+
+        // Форматируем имена городов
+        String formattedTownName = TownsDataHandler.formatCityName(townName);
+        String formattedNewTownName = TownsDataHandler.formatCityName(newTownName);
 
         // Проверка существования данных города через TownsDataHandler
-        JsonObject townData = TownsDataHandler.getRegionData(townName);
+        JsonObject townData = TownsDataHandler.getRegionData(formattedTownName);
         if (townData == null) {
             player.sendMessage("Город " + townName + " не найден.");
             return true;
@@ -48,15 +56,14 @@ public class regionchangeproperties implements CommandExecutor {
 
         // Если значение передано, сразу обновляем JSON
         if (args.length >= 3) {
-            String newValue = args[2]; // Значение, которое нужно установить
-            return updateTownProperty(player, propertyName, townName, newValue, townData);
+            return updateTownProperty(player, propertyName, formattedTownName, formattedNewTownName, townData);
         }
 
         // Если значения нет, выводим запрос на ввод через чат
         player.sendMessage("Вы хотите изменить свойство " + propertyName + " города " + townName + "?");
 
         // Формируем команду для вставки в текстовое поле
-        String commandMessage = "/regionchangeproperties " + propertyName + " \"" + townName + "\" ";
+        String commandMessage = "/regionchangeproperties " + propertyName + " \"" + formattedTownName + "\" \"" + formattedNewTownName + "\"";
 
         // Формируем JSON для tellraw с кнопкой "ДА"
         TextComponent message = new TextComponent("Хотите изменить значение свойства " + propertyName + " города " + townName + "?\n");
@@ -78,7 +85,7 @@ public class regionchangeproperties implements CommandExecutor {
     }
 
     // Метод для обновления свойства города в JSON
-    private boolean updateTownProperty(Player player, String propertyName, String townName, String newValue, JsonObject townData) {
+    private boolean updateTownProperty(Player player, String propertyName, String townName, String newTownName, JsonObject townData) {
         // Проверяем, существует ли указанное свойство в JSON
         if (!townData.has(propertyName)) {
             player.sendMessage("Свойство " + propertyName + " не найдено в данных города.");
@@ -88,28 +95,29 @@ public class regionchangeproperties implements CommandExecutor {
         // Если обновляется имя города, переименовываем файл
         if (propertyName.equalsIgnoreCase("name")) {
             String oldTownName = townName;
-            String newTownName = newValue;
+            String formattedOldTownName = TownsDataHandler.formatCityName(oldTownName);
+            String formattedNewTownName = TownsDataHandler.formatCityName(newTownName);
 
-            boolean renamed = renameTownFileProp(oldTownName, newTownName, townData);
-            renameTownFileRes(oldTownName, newTownName, townData);
-            renameTownFileBuild(oldTownName, newTownName, townData);
+            boolean renamed = renameTownFileProp(formattedOldTownName, formattedNewTownName, townData);
+            renameTownFileRes(formattedOldTownName, formattedNewTownName, townData);
+            renameTownFileBuild(formattedOldTownName, formattedNewTownName, townData);
             if (!renamed) {
                 player.sendMessage("Ошибка: не удалось переименовать файл города.");
                 return true;
             }
 
-            player.sendMessage("Файл города успешно переименован с " + oldTownName + " на " + newTownName);
+            player.sendMessage("Файл города успешно переименован с " + formattedOldTownName + " на " + formattedNewTownName);
             return true;
         }
 
         // Обновляем свойство в JSON
-        townData.addProperty(propertyName, newValue);
+        townData.addProperty(propertyName, newTownName);
 
         // Сохраняем изменения обратно в файл с помощью TownsDataHandler
-        TownsDataHandler.saveJsonToFile(townData, "towny_data/towns/" + TownsDataHandler.formatCityName(townName) + ".json");
+        TownsDataHandler.saveJsonToFile(townData, "towny_data/towns/" + newTownName + ".json");
 
         // Сообщаем игроку, что данные обновлены
-        player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
+        player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newTownName);
 
         return true;
     }
@@ -117,8 +125,8 @@ public class regionchangeproperties implements CommandExecutor {
     // Метод для переименования файла города
     private boolean renameTownFileProp(String oldTownName, String newTownName, JsonObject townData) {
         // Форматируем имена файлов
-        String oldFileName = "towny_data/towns/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
-        String newFileName = "towny_data/towns/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+        String oldFileName = "towny_data/towns/" + oldTownName + ".json";
+        String newFileName = "towny_data/towns/" + newTownName + ".json";
 
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);
@@ -146,8 +154,8 @@ public class regionchangeproperties implements CommandExecutor {
 
     private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
         // Форматируем имена файлов
-        String oldFileName = "towny_data/towns_resources/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
-        String newFileName = "towny_data/towns_resources/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+        String oldFileName = "towny_data/towns_resources/" + oldTownName + ".json";
+        String newFileName = "towny_data/towns_resources/" + newTownName + ".json";
 
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);
@@ -163,19 +171,13 @@ public class regionchangeproperties implements CommandExecutor {
         }
 
         // Переименовываем файл
-        boolean success = oldFile.renameTo(newFile);
-//        if (success) {
-//            // Обновляем JSON-данные с новым именем
-//            townData.addProperty("name", newTownName);
-//            TownsDataHandler.saveJsonToFile(townData, newFileName);
-//        }
-
-        return success;
+        return oldFile.renameTo(newFile);
     }
+
     private boolean renameTownFileBuild(String oldTownName, String newTownName, JsonObject townData) {
         // Форматируем имена файлов
-        String oldFileName = "towny_data/towns_buildings/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
-        String newFileName = "towny_data/towns_buildings/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+        String oldFileName = "towny_data/towns_buildings/" + oldTownName + ".json";
+        String newFileName = "towny_data/towns_buildings/" + newTownName + ".json";
 
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);
@@ -191,13 +193,6 @@ public class regionchangeproperties implements CommandExecutor {
         }
 
         // Переименовываем файл
-        boolean success = oldFile.renameTo(newFile);
-//        if (success) {
-//            // Обновляем JSON-данные с новым именем
-//            townData.addProperty("name", newTownName);
-//            TownsDataHandler.saveJsonToFile(townData, newFileName);
-//        }
-
-        return success;
+        return oldFile.renameTo(newFile);
     }
 }
