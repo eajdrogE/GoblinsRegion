@@ -9,10 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import Regula.goblinsRegion.commands.DBcommands.TownsDataHandler;
 
+import java.io.File;
+
 public class regionchangeproperties implements CommandExecutor {
 
     public regionchangeproperties() {
-        // Конструктор больше не использует townsDir, все обработку данных выполняет TownsDataHandler
+        // Конструктор
     }
 
     @Override
@@ -32,7 +34,7 @@ public class regionchangeproperties implements CommandExecutor {
         String propertyName = args[0]; // Имя свойства
         String townName = args[1];
 
-        // Убираем кавычки, если они есть в начале и конце строки (для корректного имени города)
+        // Убираем кавычки, если они есть в начале и конце строки
         if (townName.startsWith("\"") && townName.endsWith("\"")) {
             townName = townName.substring(1, townName.length() - 1);  // Удаляем кавычки
         }
@@ -83,6 +85,23 @@ public class regionchangeproperties implements CommandExecutor {
             return true;
         }
 
+        // Если обновляется имя города, переименовываем файл
+        if (propertyName.equalsIgnoreCase("name")) {
+            String oldTownName = townName;
+            String newTownName = newValue;
+
+            boolean renamed = renameTownFileProp(oldTownName, newTownName, townData);
+            renameTownFileRes(oldTownName, newTownName, townData);
+            renameTownFileBuild(oldTownName, newTownName, townData);
+            if (!renamed) {
+                player.sendMessage("Ошибка: не удалось переименовать файл города.");
+                return true;
+            }
+
+            player.sendMessage("Файл города успешно переименован с " + oldTownName + " на " + newTownName);
+            return true;
+        }
+
         // Обновляем свойство в JSON
         townData.addProperty(propertyName, newValue);
 
@@ -93,5 +112,92 @@ public class regionchangeproperties implements CommandExecutor {
         player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
 
         return true;
+    }
+
+    // Метод для переименования файла города
+    private boolean renameTownFileProp(String oldTownName, String newTownName, JsonObject townData) {
+        // Форматируем имена файлов
+        String oldFileName = "towny_data/towns/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
+        String newFileName = "towny_data/towns/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+
+        File oldFile = new File(oldFileName);
+        File newFile = new File(newFileName);
+
+        // Проверяем существование старого файла
+        if (!oldFile.exists()) {
+            return false; // Старый файл не существует
+        }
+
+        // Если файл с новым именем уже существует, возвращаем ошибку
+        if (newFile.exists()) {
+            return false; // Новый файл уже существует
+        }
+
+        // Переименовываем файл
+        boolean success = oldFile.renameTo(newFile);
+        if (success) {
+            // Обновляем JSON-данные с новым именем
+            townData.addProperty("name", newTownName);
+            TownsDataHandler.saveJsonToFile(townData, newFileName);
+        }
+
+        return success;
+    }
+
+    private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
+        // Форматируем имена файлов
+        String oldFileName = "towny_data/towns_resources/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
+        String newFileName = "towny_data/towns_resources/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+
+        File oldFile = new File(oldFileName);
+        File newFile = new File(newFileName);
+
+        // Проверяем существование старого файла
+        if (!oldFile.exists()) {
+            return false; // Старый файл не существует
+        }
+
+        // Если файл с новым именем уже существует, возвращаем ошибку
+        if (newFile.exists()) {
+            return false; // Новый файл уже существует
+        }
+
+        // Переименовываем файл
+        boolean success = oldFile.renameTo(newFile);
+//        if (success) {
+//            // Обновляем JSON-данные с новым именем
+//            townData.addProperty("name", newTownName);
+//            TownsDataHandler.saveJsonToFile(townData, newFileName);
+//        }
+
+        return success;
+    }
+    private boolean renameTownFileBuild(String oldTownName, String newTownName, JsonObject townData) {
+        // Форматируем имена файлов
+        String oldFileName = "towny_data/towns_buildings/" + TownsDataHandler.formatCityName(oldTownName) + ".json";
+        String newFileName = "towny_data/towns_buildings/" + TownsDataHandler.formatCityName(newTownName) + ".json";
+
+        File oldFile = new File(oldFileName);
+        File newFile = new File(newFileName);
+
+        // Проверяем существование старого файла
+        if (!oldFile.exists()) {
+            return false; // Старый файл не существует
+        }
+
+        // Если файл с новым именем уже существует, возвращаем ошибку
+        if (newFile.exists()) {
+            return false; // Новый файл уже существует
+        }
+
+        // Переименовываем файл
+        boolean success = oldFile.renameTo(newFile);
+//        if (success) {
+//            // Обновляем JSON-данные с новым именем
+//            townData.addProperty("name", newTownName);
+//            TownsDataHandler.saveJsonToFile(townData, newFileName);
+//        }
+
+        return success;
     }
 }
