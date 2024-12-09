@@ -29,3 +29,6 @@ commands:
   changenationlist:
     description: "Открывает меню с нациями."
     usage: "/changenationlist"
+  changenationproperties:
+    description: "Изменяет свойства нации."
+    usage: "/changenationproperties <property> <nationName> <variables>"

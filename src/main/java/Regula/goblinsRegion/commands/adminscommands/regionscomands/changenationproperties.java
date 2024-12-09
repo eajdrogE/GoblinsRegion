@@ -10,7 +10,9 @@ import org.bukkit.entity.Player;
 import Regula.goblinsRegion.commands.DBcommands.NationDataHandler;
 
 public class changenationproperties implements CommandExecutor {
-
+    public changenationproperties() {
+        // Конструктор
+    }
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
