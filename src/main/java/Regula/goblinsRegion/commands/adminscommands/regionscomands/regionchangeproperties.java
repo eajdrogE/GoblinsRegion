@@ -85,43 +85,24 @@ public class regionchangeproperties implements CommandExecutor {
     }
 
     // Метод для обновления свойства города в JSON
-    private boolean updateTownProperty(Player player, String propertyName, String townName, String newTownName, JsonObject townData) {
+    private boolean updateTownProperty(Player player, String propertyName, String townName, String newValue, JsonObject townData) {
         // Проверяем, существует ли указанное свойство в JSON
         if (!townData.has(propertyName)) {
             player.sendMessage("Свойство " + propertyName + " не найдено в данных города.");
             return true;
         }
 
-        // Если обновляется имя города, переименовываем файл
-        if (propertyName.equalsIgnoreCase("name")) {
-            String oldTownName = townName;
-            String formattedOldTownName = TownsDataHandler.formatCityName(oldTownName);
-            String formattedNewTownName = TownsDataHandler.formatCityName(newTownName);
-
-            boolean renamed = renameTownFileProp(formattedOldTownName, formattedNewTownName, townData);
-            renameTownFileRes(formattedOldTownName, formattedNewTownName, townData);
-            renameTownFileBuild(formattedOldTownName, formattedNewTownName, townData);
-            if (!renamed) {
-                player.sendMessage("Ошибка: не удалось переименовать файл города.");
-                return true;
-            }
-
-            player.sendMessage("Файл города успешно переименован с " + formattedOldTownName + " на " + formattedNewTownName);
-            return true;
-        }
-
         // Обновляем свойство в JSON
-        townData.addProperty(propertyName, newTownName);
+        townData.addProperty(propertyName, newValue);
 
         // Сохраняем изменения обратно в файл с помощью TownsDataHandler
-        TownsDataHandler.saveJsonToFile(townData, "towny_data/towns/" + newTownName + ".json");
+        TownsDataHandler.saveCityData(townData, townName);
 
         // Сообщаем игроку, что данные обновлены
-        player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newTownName);
+        player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
 
         return true;
     }
-
     // Метод для переименования файла города
     private boolean renameTownFileProp(String oldTownName, String newTownName, JsonObject townData) {
         // Форматируем имена файлов
