@@ -26,3 +26,6 @@ commands:
   changenation:
     description: "Открывает меню со статистикой нации."
     usage: "/changenation <название нации>"
+  changenationlist:
+    description: "Открывает меню с нациями."
+    usage: "/changenationlist"

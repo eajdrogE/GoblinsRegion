@@ -25,14 +25,19 @@ public final class GoblinsRegion extends JavaPlugin {
         registerCommand("filltownydb", new FillTownyDb());
         registerCommand("changeregion", new changeregion());
         registerCommand("changenation", new changenation());
+        registerCommand("changenationlist", new changenationlist());
         registerCommand("regionpropertiesadmin", new regionpropertiesadmin());
         registerCommand("regionchangeproperties", new regionchangeproperties());
         getCommand("regionchangeproperties").setExecutor(new regionchangeproperties());
         getCommand("changeregion").setExecutor(new changeregion());
         getCommand("changenation").setExecutor(new changenation());
+        getCommand("changenationlist").setExecutor(new changenationlist());
         getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin());
+        getCommand("changenationproperties").setExecutor(new changenationproperties());
+        registerCommand(" changenationproperties", new  changenationproperties());
+        //getServer().getPluginManager().registerEvents(new changenationproperties(), this);
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(), this);
-
+        getServer().getPluginManager().registerEvents(new changenationlist(), this);
         getServer().getPluginManager().registerEvents(new regionchangeresources(), this);
         getLogger().info("       ,      ,      ");
         getLogger().info("      /(.-\"\"-.)\\");
