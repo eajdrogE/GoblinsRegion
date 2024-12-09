@@ -36,6 +36,7 @@ public final class GoblinsRegion extends JavaPlugin {
         getCommand("changenationproperties").setExecutor(new changenationproperties());
         registerCommand("changenationproperties", new  changenationproperties());
         //getServer().getPluginManager().registerEvents(new changenationproperties(), this);
+        getServer().getPluginManager().registerEvents(new changenation(), this);
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(), this);
         getServer().getPluginManager().registerEvents(new changenationlist(), this);
         getServer().getPluginManager().registerEvents(new regionchangeresources(), this);

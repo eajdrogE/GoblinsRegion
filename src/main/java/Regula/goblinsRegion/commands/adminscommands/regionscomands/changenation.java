@@ -58,7 +58,7 @@ public class changenation implements CommandExecutor, Listener {
         }
 
         // Создание GUI-меню
-        Inventory inventory = Bukkit.createInventory(null, 27, ChatColor.GOLD + "Статистика нации: " + nationName);
+        Inventory inventory = Bukkit.createInventory(null, 27, "Нация: " + NationDataHandler.formatNationName(nationName));
 
         // Сборник всей информации нации в первом слоте
         addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Общая информация",
@@ -125,8 +125,8 @@ public class changenation implements CommandExecutor, Listener {
         if (!(event.getWhoClicked() instanceof Player)) return;
 
         Player player = (Player) event.getWhoClicked();
-        if (event.getView().getTitle().startsWith(ChatColor.GOLD + "Статистика нации")) {
-            event.setCancelled(true); // Запрет взаимодействия с инвентарем
+        if (event.getView().getTitle().startsWith("Нация:")) {
+            event.setCancelled(true); // Запрет на любые клики
             player.sendMessage(ChatColor.RED + "Вы не можете взаимодействовать с этим инвентарем.");
         }
     }
