@@ -149,7 +149,7 @@ public class changenationlist implements CommandExecutor, Listener {
                 openNationList(player, currentPage + 1);
             } else {
                 String nationName = itemName;
-                player.performCommand("nationpropertiesadmin " + nationName);
+                player.performCommand("changenation " + nationName);
                 player.sendMessage("Вы выбрали нацию: " + nationName);
             }
         }
