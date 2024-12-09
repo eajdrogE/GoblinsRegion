@@ -60,7 +60,7 @@ public class TownsDataHandler {
             e.printStackTrace();
         }
     }
-    
+
     // Проверка, существует ли файл по данному пути
     public static boolean fileExists(String path) {
         return java.nio.file.Files.exists(java.nio.file.Path.of(path));

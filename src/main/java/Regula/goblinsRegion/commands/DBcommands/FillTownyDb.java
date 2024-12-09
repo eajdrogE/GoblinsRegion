@@ -101,7 +101,7 @@ public class FillTownyDb implements CommandExecutor {
         Collection<Nation> nations = TownyUniverse.getInstance().getNations();
         for (Nation nation : nations) {
             JsonObject nationJson = new JsonObject();
-            nationJson.addProperty("name", TownsDataHandler.formatCityName(nation.getName()));
+            nationJson.addProperty("name", nation.getName());
             nationJson.addProperty("income", 0);
             nationJson.addProperty("limit", 0);
             nationJson.addProperty("attackLimit", 0);
@@ -123,13 +123,8 @@ public class FillTownyDb implements CommandExecutor {
             nationJson.addProperty("rulerRace", "Default Race");
             nationJson.addProperty("menuMaterial", "PAPER");
 
-            // Запись данных нации в папку towny_data/nations
-            try (FileWriter writer = new FileWriter(new File(nationsDir, TownsDataHandler.formatCityName(nation.getName()) + ".json"))) {
-                gson.toJson(nationJson, writer);
-            } catch (IOException e) {
-                player.sendMessage("Ошибка записи данных нации: " + nation.getName());
-                e.printStackTrace();
-            }
+            // Использование методов NationDataHandler для сохранения наций
+            NationDataHandler.saveNationData(nationJson, NationDataHandler.formatNationName(nation.getName()));
         }
 
         player.sendMessage("Данные городов и наций успешно сохранены.");

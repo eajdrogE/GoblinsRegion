@@ -2,10 +2,7 @@ package Regula.goblinsRegion;
 
 import Regula.goblinsRegion.commands.DBcommands.FillTownyDb;
 import Regula.goblinsRegion.commands.adminscommands.regions;
-import Regula.goblinsRegion.commands.adminscommands.regionscomands.changeregion;
-import Regula.goblinsRegion.commands.adminscommands.regionscomands.regionchangeproperties;
-import Regula.goblinsRegion.commands.adminscommands.regionscomands.regionchangeresources;
-import Regula.goblinsRegion.commands.adminscommands.regionscomands.regionpropertiesadmin;
+import Regula.goblinsRegion.commands.adminscommands.regionscomands.*;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,15 +24,29 @@ public final class GoblinsRegion extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new changeregion(), this);
         registerCommand("filltownydb", new FillTownyDb());
         registerCommand("changeregion", new changeregion());
+        registerCommand("changenation", new changenation());
         registerCommand("regionpropertiesadmin", new regionpropertiesadmin());
         registerCommand("regionchangeproperties", new regionchangeproperties());
         getCommand("regionchangeproperties").setExecutor(new regionchangeproperties());
         getCommand("changeregion").setExecutor(new changeregion());
+        getCommand("changenation").setExecutor(new changenation());
         getCommand("regionpropertiesadmin").setExecutor(new regionpropertiesadmin());
         getServer().getPluginManager().registerEvents(new regionpropertiesadmin(), this);
 
         getServer().getPluginManager().registerEvents(new regionchangeresources(), this);
-        getLogger().info("GoblinsRegion плагин успешно включен!");
+        getLogger().info("       ,      ,      ");
+        getLogger().info("      /(.-\"\"-.)\\");
+        getLogger().info("  |\\  \\/      \\/  /|");
+        getLogger().info("  | \\ / =.  .= \\ / |");
+        getLogger().info("  \\( \\   o\\/o   / )/");
+        getLogger().info("   \\_, '-/  \\-' ,_/ ");
+        getLogger().info("     /   \\__/   \\  ");
+        getLogger().info("     \\ \\__/\\__/ / ");
+        getLogger().info("   ___\\ \\|--|/ /___");
+        getLogger().info("  /`   \\      /    `\\");
+        getLogger().info(" /      '----'       \\");
+        getLogger().info(" GoblinRegion by Egordjae");
+
     }
 
     @Override
