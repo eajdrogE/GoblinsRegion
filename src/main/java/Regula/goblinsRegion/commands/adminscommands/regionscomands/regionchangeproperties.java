@@ -91,16 +91,12 @@ public class regionchangeproperties implements CommandExecutor {
             player.sendMessage("Свойство " + propertyName + " не найдено в данных города.");
             return true;
         }
-
         // Обновляем свойство в JSON
         townData.addProperty(propertyName, newValue);
-
         // Сохраняем изменения обратно в файл с помощью TownsDataHandler
         TownsDataHandler.saveCityData(townData, townName);
-
         // Сообщаем игроку, что данные обновлены
         player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
-
         return true;
     }
     // Метод для переименования файла города

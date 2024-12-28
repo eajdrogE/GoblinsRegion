@@ -71,7 +71,6 @@ public class changenationlist implements CommandExecutor, Listener {
                 player.sendMessage("Ошибка загрузки данных для нации: " + nationFile.getName());
                 continue;
             }
-
             // Теперь мы используем nationJson как объект JsonObject
             String nationName = nationJson.has("name") ? nationJson.get("name").getAsString() : "Неизвестная нация";
             String materialName = nationJson.has("menuMaterial") ? nationJson.get("menuMaterial").getAsString() : "MAP";
@@ -80,17 +79,14 @@ public class changenationlist implements CommandExecutor, Listener {
             if (menuMaterial == null) {
                 menuMaterial = Material.MAP;
             }
-
             ItemStack itemStack = new ItemStack(menuMaterial);
             ItemMeta meta = itemStack.getItemMeta();
             if (meta != null) {
                 meta.setDisplayName(nationName);
                 itemStack.setItemMeta(meta);
             }
-
             inventory.addItem(itemStack);
         }
-
         // Добавление стрелок навигации
         if (page > 0) {
             ItemStack previousPage = new ItemStack(Material.ARROW);
@@ -101,7 +97,6 @@ public class changenationlist implements CommandExecutor, Listener {
             }
             inventory.setItem(45, previousPage);
         }
-
         if (page < totalPages - 1) {
             ItemStack nextPage = new ItemStack(Material.ARROW);
             ItemMeta meta = nextPage.getItemMeta();
@@ -114,8 +109,6 @@ public class changenationlist implements CommandExecutor, Listener {
 
         player.openInventory(inventory);
     }
-
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
@@ -127,18 +120,14 @@ public class changenationlist implements CommandExecutor, Listener {
             if (slot >= event.getView().getTopInventory().getSize()) {
                 return;
             }
-
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null || clickedItem.getType() == Material.AIR) {
                 return;
             }
-
             if (!clickedItem.hasItemMeta() || clickedItem.getItemMeta().getDisplayName() == null) {
                 return;
             }
-
             String itemName = clickedItem.getItemMeta().getDisplayName();
-
             if (itemName.equals("Предыдущая страница")) {
                 String[] titleParts = event.getView().getTitle().split(" ");
                 int currentPage = titleParts.length > 1 ? Integer.parseInt(titleParts[1]) : 0;

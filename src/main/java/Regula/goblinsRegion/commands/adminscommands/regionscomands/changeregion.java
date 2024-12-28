@@ -48,7 +48,6 @@ public class changeregion implements CommandExecutor, Listener {
             player.sendMessage("Папка с данными городов не найдена.");
             return;
         }
-
         File[] townFiles = townsDir.listFiles((dir, name) -> name.endsWith(".json"));
         if (townFiles == null || townFiles.length == 0) {
             player.sendMessage("Нет данных о городах.");
@@ -95,7 +94,6 @@ public class changeregion implements CommandExecutor, Listener {
 
             inventory.addItem(itemStack);
         }
-
         // Добавление стрелок навигации
         if (page > 0) {
             ItemStack previousPage = new ItemStack(Material.ARROW);
@@ -106,7 +104,6 @@ public class changeregion implements CommandExecutor, Listener {
             }
             inventory.setItem(45, previousPage);
         }
-
         if (page < totalPages - 1) {
             ItemStack nextPage = new ItemStack(Material.ARROW);
             ItemMeta meta = nextPage.getItemMeta();
@@ -123,27 +120,22 @@ public class changeregion implements CommandExecutor, Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-
         // Проверяем, что это наш кастомный инвентарь
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "RegionList")) {
             event.setCancelled(true); // Блокируем взаимодействие
-
             // Проверка, что клик в верхнем инвентаре
             int slot = event.getRawSlot();
             if (slot >= event.getView().getTopInventory().getSize()) {
                 return; // Игнорируем клики в инвентаре игрока
             }
-
             ItemStack clickedItem = event.getCurrentItem();
             if (clickedItem == null || clickedItem.getType() == Material.AIR) {
                 return; // Игнорируем пустые слоты
             }
-
             // Проверяем наличие метаданных
             if (!clickedItem.hasItemMeta() || clickedItem.getItemMeta().getDisplayName() == null) {
                 return;
             }
-
             String itemName = clickedItem.getItemMeta().getDisplayName();
 
             // Обработка перехода между страницами

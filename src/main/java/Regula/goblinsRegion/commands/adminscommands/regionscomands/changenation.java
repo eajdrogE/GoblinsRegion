@@ -42,24 +42,19 @@ public class changenation implements CommandExecutor, Listener {
             player.sendMessage(ChatColor.RED + "У вас нет прав для выполнения этой команды.");
             return true;
         }
-
         if (args.length != 1) {
             player.sendMessage(ChatColor.RED + "Использование: /changenation <название нации>");
             return true;
         }
-
         String nationName = args[0];
-
         // Загрузка данных нации из файла
         JsonObject nationData = NationDataHandler.loadNationData(nationName);
         if (nationData == null) {
             player.sendMessage(ChatColor.RED + "Нация с именем \"" + nationName + "\" не найдена.");
             return true;
         }
-
         // Создание GUI-меню
         Inventory inventory = Bukkit.createInventory(null, 27, "Нация: " + NationDataHandler.formatNationName(nationName));
-
         // Сборник всей информации нации в первом слоте
         addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Общая информация",
                 "Доход: " + nationData.get("income").getAsInt(),
@@ -103,12 +98,10 @@ public class changenation implements CommandExecutor, Listener {
                 String.valueOf(nationData.get("clergyLoyalty").getAsInt()));
         addItemToInventory(inventory, Material.HAY_BLOCK, ChatColor.YELLOW + "Репутация крестьян",
                 String.valueOf(nationData.get("commonersLoyalty").getAsInt()));
-
         // Открытие меню для игрока
         player.openInventory(inventory);
         return true;
     }
-
     private void addItemToInventory(Inventory inventory, Material material, String name, String... loreLines) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -119,7 +112,6 @@ public class changenation implements CommandExecutor, Listener {
         }
         inventory.addItem(item);
     }
-
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;

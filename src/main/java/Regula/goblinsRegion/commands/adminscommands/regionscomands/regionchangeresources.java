@@ -156,10 +156,8 @@ public class regionchangeresources implements CommandExecutor, Listener {
             if (cleanJsonResourceName.equals(cleanResourceName)) {
                 int currentAmount = resource.get("amount").getAsInt();
                 int newAmount = Math.max(currentAmount + delta, 0); // Гарантируем, что количество не станет отрицательным
-
                 // Отладка
                 player.sendMessage("Изменение ресурса '" + cleanResourceName + "': " + currentAmount + " -> " + newAmount);
-
                 resource.addProperty("amount", newAmount); // Обновляем количество ресурса
                 return true;
             }
@@ -169,12 +167,9 @@ public class regionchangeresources implements CommandExecutor, Listener {
         player.sendMessage(ChatColor.RED + "Ресурс '" + resourceName + "' не найден в JSON.");
         return false;
     }
-
-
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
     }
-
     private String extractTownNameFromInventoryTitle(String title) {
         if (title.startsWith("Ресурсы региона: ")) {
             return title.substring("Ресурсы региона: ".length());

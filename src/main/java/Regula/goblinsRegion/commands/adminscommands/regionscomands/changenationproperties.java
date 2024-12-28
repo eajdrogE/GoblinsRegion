@@ -21,7 +21,6 @@ public class changenationproperties implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-
         if (!player.hasPermission("RegionModer")) {
             player.sendMessage("У вас нет прав для выполнения этой команды.");
             return true;
@@ -35,14 +34,12 @@ public class changenationproperties implements CommandExecutor {
         String nationName = args[0]; // Название нации
         String propertyName = args[1]; // Свойство, которое мы хотим изменить
         String propertyValue = args.length > 2 ? args[2] : ""; // Значение для свойства
-
         // Загружаем данные нации
         JsonObject nationData = NationDataHandler.loadNationData(nationName);
         if (nationData == null) {
             player.sendMessage(ChatColor.RED + "Нация с таким названием не найдена.");
             return true;
         }
-
         // Проверка на существование свойства и изменение
         if (nationData.has(propertyName)) {
             nationData.addProperty(propertyName, propertyValue); // Обновляем значение свойства
