@@ -119,7 +119,23 @@ public class changenation implements CommandExecutor, Listener {
         Player player = (Player) event.getWhoClicked();
         if (event.getView().getTitle().startsWith("Нация:")) {
             event.setCancelled(true); // Запрет на любые клики
-            player.sendMessage(ChatColor.RED + "Вы не можете взаимодействовать с этим инвентарем.");
+
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
+
+            String itemName = clickedItem.getItemMeta().getDisplayName();
+            String nationName = event.getView().getTitle().substring("Нация: ".length());
+
+            if (itemName.equals(ChatColor.DARK_BLUE + "Правитель")) {
+                player.sendMessage(ChatColor.YELLOW + "Это свойство предназначено только для просмотра.");
+                return;
+            }
+
+            String propertyName = ChatColor.stripColor(itemName);
+            String command = "/nationchangeproperties " + propertyName + " " + nationName;
+
+            player.closeInventory();
+            player.chat(command);
         }
     }
 }

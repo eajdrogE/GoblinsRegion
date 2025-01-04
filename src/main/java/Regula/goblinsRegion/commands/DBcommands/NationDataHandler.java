@@ -31,34 +31,6 @@ public class NationDataHandler {
         saveJsonToFile(nationData, path);
     }
 
-    // Получение данных нации в виде строки (например, для вывода в чат)
-    public static String getNationData(String nationName) {
-        JsonObject nationData = loadNationData(nationName);
-
-        if (nationData == null) {
-            return "Нация не найдена!";
-        }
-
-        // Форматируем строку с данными нации для вывода
-        StringBuilder sb = new StringBuilder();
-        sb.append("Информация о нации: ").append(nationName).append("\n");
-
-        // Пример вывода данных
-        if (nationData.has("name")) {
-            sb.append("Название нации: ").append(nationData.get("name").getAsString()).append("\n");
-        }
-        if (nationData.has("leader")) {
-            sb.append("Лидер нации: ").append(nationData.get("leader").getAsString()).append("\n");
-        }
-        if (nationData.has("population")) {
-            sb.append("Численность населения: ").append(nationData.get("population").getAsString()).append("\n");
-        }
-        // Добавьте другие данные нации, если они есть, например, экономика, ресурсы и т.д.
-
-        return sb.toString();
-    }
-
-    // Обновление свойства нации
     public static boolean updateNationProperty(String nationName, String propertyName, String propertyValue) {
         JsonObject nationData = loadNationData(nationName);
 
