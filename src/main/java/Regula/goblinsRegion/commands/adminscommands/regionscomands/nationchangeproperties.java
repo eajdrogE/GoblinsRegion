@@ -9,6 +9,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import Regula.goblinsRegion.commands.DBcommands.NationDataHandler;
 
+import java.io.File;
+
 public class nationchangeproperties implements CommandExecutor {
 
     public nationchangeproperties() {
@@ -32,14 +34,14 @@ public class nationchangeproperties implements CommandExecutor {
 
         // Проверка правильности ввода аргументов
         if (args.length < 2) {
-            player.sendMessage("Использование: /nationchangeproperties  <nationName> <property> <newValue>");
+            player.sendMessage("Использование: /nationchangeproperties <property> <nationName> <newValue>");
             return true;
         }
-        String nationName = args[0];
-        String propertyName = args[1]; // Имя свойства
+        String propertyName= args[0];
+        String nationName  = args[1]; // Имя свойства
         // Название нации
         String newValue = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)); // Новое значение
-
+    
         // Загружаем данные нации
         JsonObject nationData = NationDataHandler.loadNationData(nationName);
         if (nationData == null) {
@@ -89,7 +91,47 @@ public class nationchangeproperties implements CommandExecutor {
         // Сохраняем изменения обратно в файл с помощью NationDataHandler
         NationDataHandler.saveNationData(nationData, nationName);
         // Сообщаем игроку, что данные обновлены
+        if (propertyName.equalsIgnoreCase("name")) {
+            boolean renamedProp = renameNationFileProp(nationName, newValue, nationData);
+
+            if (renamedProp) {
+                player.sendMessage("Название города успешно изменено на: " + newValue);
+            }
+        }
         player.sendMessage("Свойство " + propertyName + " для нации " + nationName + " успешно изменено на: " + newValue);
         return true;
+    }
+    private boolean renameNationFileProp(String oldNationName, String newNationName, JsonObject nationData) {
+        String oldFileName = "towny_data/nations/" + oldNationName + ".json";
+        String newFileName = "towny_data/nations/" + newNationName + ".json";
+        return renameFile(oldFileName, newFileName, nationData);
+    }
+    private boolean renameFile(String oldFileName, String newFileName, JsonObject nationData) {
+        File oldFile = new File(oldFileName);
+        File newFile = new File(newFileName);
+
+        if (!oldFile.exists()) {
+            return false; // Старый файл не существует
+        }
+
+        if (newFile.exists()) {
+            return false; // Новый файл уже существует
+        }
+
+        // Переименовываем файл
+        boolean success = oldFile.renameTo(newFile);
+        if (success) {
+            nationData.addProperty("name", newFileName); // Обновляем имя в JSON
+            return true;
+        } else {
+            // Если переименование не удалось, удаляем старый файл
+            boolean deleted = oldFile.delete();
+            if (deleted) {
+                System.out.println("Старый файл был удалён: " + oldFileName);
+            } else {
+                System.err.println("Не удалось удалить старый файл: " + oldFileName);
+            }
+        }
+        return success;
     }
 }

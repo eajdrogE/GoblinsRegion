@@ -25,9 +25,12 @@ public class regionchangeproperties implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-
+        if (!player.hasPermission("RegionModer")) {
+            player.sendMessage("У вас нет прав для выполнения этой команды.");
+            return true;
+        }
         if (args.length < 2) {
-            player.sendMessage("Использование: /regionchangeproperties <property> <townName> <newTownName...>");
+            player.sendMessage("Использование: /regionchangeproperties <property> <townName> <newValue>");
             return true;
         }
 
@@ -63,7 +66,7 @@ public class regionchangeproperties implements CommandExecutor {
         player.sendMessage("Вы хотите изменить свойство " + propertyName + " города " + townName + "?");
 
         // Формируем команду для вставки в текстовое поле
-        String commandMessage = "/regionchangeproperties " + propertyName + " \"" + formattedTownName + "\" \"" + formattedNewTownName + "\"";
+        String commandMessage = "/regionchangeproperties " + propertyName + " " + formattedTownName + " ";
 
         // Формируем JSON для tellraw с кнопкой "ДА"
         TextComponent message = new TextComponent("Хотите изменить значение свойства " + propertyName + " города " + townName + "?\n");
@@ -103,9 +106,6 @@ public class regionchangeproperties implements CommandExecutor {
 
             if (renamedProp && renamedRes && renamedBuild) {
                 player.sendMessage("Название города успешно изменено на: " + newValue);
-            } else {
-                player.sendMessage("Не удалось переименовать файлы для города " + townName + ". Проверьте логи.");
-                return true;
             }
         }
         player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);

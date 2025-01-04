@@ -132,7 +132,7 @@ public class nationchange implements CommandExecutor, Listener {
             }
 
             String propertyName = ChatColor.stripColor(itemName);
-            String command = "/nationchangeproperties " + nationName + " " + propertyName;
+            String command = "/nationchangeproperties " + propertyName + " " + nationName;
 
             player.closeInventory();
             player.chat(command);
