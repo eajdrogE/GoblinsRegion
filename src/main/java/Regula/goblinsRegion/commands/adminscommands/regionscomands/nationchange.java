@@ -21,9 +21,9 @@ import Regula.goblinsRegion.commands.DBcommands.NationDataHandler;
 
 import java.util.List;
 
-public class changenation implements CommandExecutor, Listener {
+public class nationchange implements CommandExecutor, Listener {
 
-    public changenation() {
+    public nationchange() {
     }
 
     @Override
@@ -43,7 +43,7 @@ public class changenation implements CommandExecutor, Listener {
             return true;
         }
         if (args.length != 1) {
-            player.sendMessage(ChatColor.RED + "Использование: /changenation <название нации>");
+            player.sendMessage(ChatColor.RED + "Использование: /nationchange <название нации>");
             return true;
         }
         String nationName = args[0];
@@ -132,7 +132,7 @@ public class changenation implements CommandExecutor, Listener {
             }
 
             String propertyName = ChatColor.stripColor(itemName);
-            String command = "/nationchangeproperties " + propertyName + " " + nationName;
+            String command = "/nationchangeproperties " + nationName + " " + propertyName;
 
             player.closeInventory();
             player.chat(command);

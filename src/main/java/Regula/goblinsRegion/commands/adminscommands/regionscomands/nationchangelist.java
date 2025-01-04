@@ -18,7 +18,7 @@ import Regula.goblinsRegion.commands.DBcommands.NationDataHandler;
 
 import java.io.File;
 
-public class changenationlist implements CommandExecutor, Listener {
+public class nationchangelist implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -138,7 +138,7 @@ public class changenationlist implements CommandExecutor, Listener {
                 openNationList(player, currentPage + 1);
             } else {
                 String nationName = itemName;
-                player.performCommand("changenation " + nationName);
+                player.performCommand("nationchange " + nationName);
                 player.sendMessage("Вы выбрали нацию: " + nationName);
             }
         }

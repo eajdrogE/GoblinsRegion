@@ -23,12 +23,12 @@ commands:
   regionchangeresources:
     description: "Открывает меню ресурсов для города"
     usage: "/regionchangeresources <город>"
-  changenation:
+  nationchange:
     description: "Открывает меню со статистикой нации."
-    usage: "/changenation <название нации>"
-  changenationlist:
+    usage: "/nationchange <название нации>"
+  nationchangelist:
     description: "Открывает меню с нациями."
-    usage: "/changenationlist"
-  changenationproperties:
+    usage: "/nationchangelist"
+  nationchangeproperties:
     description: "Изменяет свойства нации."
-    usage: "/changenationproperties <property> <nationName> <variables>"
+    usage: "/nationchangeproperties <property> <nationName> <variables>"
