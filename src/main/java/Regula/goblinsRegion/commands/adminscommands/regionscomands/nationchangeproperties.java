@@ -32,12 +32,12 @@ public class nationchangeproperties implements CommandExecutor {
 
         // Проверка правильности ввода аргументов
         if (args.length < 2) {
-            player.sendMessage("Использование: /nationchangeproperties <property> <nationName> <newValue>");
+            player.sendMessage("Использование: /nationchangeproperties  <nationName> <property> <newValue>");
             return true;
         }
-
-        String propertyName = args[0]; // Имя свойства
-        String nationName = args[1]; // Название нации
+        String nationName = args[0];
+        String propertyName = args[1]; // Имя свойства
+        // Название нации
         String newValue = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)); // Новое значение
 
         // Загружаем данные нации
