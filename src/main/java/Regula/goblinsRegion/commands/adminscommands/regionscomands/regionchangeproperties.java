@@ -96,24 +96,48 @@ public class regionchangeproperties implements CommandExecutor {
         // Сохраняем изменения обратно в файл с помощью TownsDataHandler
         TownsDataHandler.saveCityData(townData, townName);
         // Сообщаем игроку, что данные обновлены
+        if (propertyName.equalsIgnoreCase("name")) {
+            boolean renamedProp = renameTownFileProp(townName, newValue, townData);
+            boolean renamedRes = renameTownFileRes(townName, newValue, townData);
+            boolean renamedBuild = renameTownFileBuild(townName, newValue, townData);
+
+            if (renamedProp && renamedRes && renamedBuild) {
+                player.sendMessage("Название города успешно изменено на: " + newValue);
+            } else {
+                player.sendMessage("Не удалось переименовать файлы для города " + townName + ". Проверьте логи.");
+                return true;
+            }
+        }
         player.sendMessage("Свойство " + propertyName + " для города " + townName + " успешно изменено на: " + newValue);
         return true;
     }
     // Метод для переименования файла города
     private boolean renameTownFileProp(String oldTownName, String newTownName, JsonObject townData) {
-        // Форматируем имена файлов
         String oldFileName = "towny_data/towns/" + oldTownName + ".json";
         String newFileName = "towny_data/towns/" + newTownName + ".json";
+        return renameFile(oldFileName, newFileName, townData);
+    }
 
+    private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
+        String oldFileName = "towny_data/towns_resources/" + oldTownName + ".json";
+        String newFileName = "towny_data/towns_resources/" + newTownName + ".json";
+        return renameFile(oldFileName, newFileName, townData);
+    }
+
+    private boolean renameTownFileBuild(String oldTownName, String newTownName, JsonObject townData) {
+        String oldFileName = "towny_data/towns_buildings/" + oldTownName + ".json";
+        String newFileName = "towny_data/towns_buildings/" + newTownName + ".json";
+        return renameFile(oldFileName, newFileName, townData);
+    }
+
+    private boolean renameFile(String oldFileName, String newFileName, JsonObject townData) {
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);
 
-        // Проверяем существование старого файла
         if (!oldFile.exists()) {
             return false; // Старый файл не существует
         }
 
-        // Если файл с новым именем уже существует, возвращаем ошибку
         if (newFile.exists()) {
             return false; // Новый файл уже существует
         }
@@ -121,55 +145,17 @@ public class regionchangeproperties implements CommandExecutor {
         // Переименовываем файл
         boolean success = oldFile.renameTo(newFile);
         if (success) {
-            // Обновляем JSON-данные с новым именем
-            townData.addProperty("name", newTownName);
-            TownsDataHandler.saveJsonToFile(townData, newFileName);
+            townData.addProperty("name", newFileName); // Обновляем имя в JSON
+            return true;
+        } else {
+            // Если переименование не удалось, удаляем старый файл
+            boolean deleted = oldFile.delete();
+            if (deleted) {
+                System.out.println("Старый файл был удалён: " + oldFileName);
+            } else {
+                System.err.println("Не удалось удалить старый файл: " + oldFileName);
+            }
         }
-
         return success;
-    }
-
-    private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
-        // Форматируем имена файлов
-        String oldFileName = "towny_data/towns_resources/" + oldTownName + ".json";
-        String newFileName = "towny_data/towns_resources/" + newTownName + ".json";
-
-        File oldFile = new File(oldFileName);
-        File newFile = new File(newFileName);
-
-        // Проверяем существование старого файла
-        if (!oldFile.exists()) {
-            return false; // Старый файл не существует
-        }
-
-        // Если файл с новым именем уже существует, возвращаем ошибку
-        if (newFile.exists()) {
-            return false; // Новый файл уже существует
-        }
-
-        // Переименовываем файл
-        return oldFile.renameTo(newFile);
-    }
-
-    private boolean renameTownFileBuild(String oldTownName, String newTownName, JsonObject townData) {
-        // Форматируем имена файлов
-        String oldFileName = "towny_data/towns_buildings/" + oldTownName + ".json";
-        String newFileName = "towny_data/towns_buildings/" + newTownName + ".json";
-
-        File oldFile = new File(oldFileName);
-        File newFile = new File(newFileName);
-
-        // Проверяем существование старого файла
-        if (!oldFile.exists()) {
-            return false; // Старый файл не существует
-        }
-
-        // Если файл с новым именем уже существует, возвращаем ошибку
-        if (newFile.exists()) {
-            return false; // Новый файл уже существует
-        }
-
-        // Переименовываем файл
-        return oldFile.renameTo(newFile);
     }
 }
