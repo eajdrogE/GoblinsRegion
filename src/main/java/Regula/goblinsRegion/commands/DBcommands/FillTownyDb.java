@@ -68,20 +68,20 @@ public class FillTownyDb implements CommandExecutor {
         Collection<Town> towns = TownyUniverse.getInstance().getTowns();
         for (Town town : towns) {
             JsonObject townJson = new JsonObject();
-            townJson.addProperty("name", TownsDataHandler.formatCityName(town.getName()));
-            townJson.addProperty("stability", 10);
-            townJson.addProperty("prosperity", 200);
-            townJson.addProperty("limit", 1);
-            townJson.addProperty("replenishmentPoints", 0);
-            townJson.addProperty("culture", "Default Culture");
-            townJson.addProperty("hasSeaAccess", false);
-            townJson.addProperty("baseStability", 10);
-            townJson.addProperty("stabilityGrowthToBase", 1);
-            townJson.addProperty("stabilityGrowthBeyondBase", 0);
-            townJson.addProperty("maxStability", 20);
-            townJson.addProperty("prosperityGrowth", 0);
-            townJson.addProperty("limitGrowth", 0);
-            townJson.addProperty("menuMaterial", "PAPER");
+            townJson.addProperty("Название", TownsDataHandler.formatCityName(town.getName()));
+            townJson.addProperty("Стабильность", 10);
+            townJson.addProperty("Процветание", 200);
+            townJson.addProperty("Лимит", 1);
+            townJson.addProperty("Очки_пополнения", 0);
+            townJson.addProperty("Культура", "Default Culture");
+            townJson.addProperty("Доступ_к_морю", false);
+            townJson.addProperty("Базовая стабильность", 10);
+            townJson.addProperty("Рост_стабильности_к_базовой", 1);
+            townJson.addProperty("Рост_стабильности-за_пределами_базовой", 0);
+            townJson.addProperty("Максимальная_стабильность", 20);
+            townJson.addProperty("Рост_процветания", 0);
+            townJson.addProperty("Рост_лимита", 0);
+            townJson.addProperty("Материал_иконки", "PAPER");
 
             // Запись основных данных города в папку towny_data/towns
             try (FileWriter writer = new FileWriter(new File(townsDir, TownsDataHandler.formatCityName(town.getName()) + ".json"))) {
@@ -101,27 +101,27 @@ public class FillTownyDb implements CommandExecutor {
         Collection<Nation> nations = TownyUniverse.getInstance().getNations();
         for (Nation nation : nations) {
             JsonObject nationJson = new JsonObject();
-            nationJson.addProperty("name", nation.getName());
-            nationJson.addProperty("income", 0);
-            nationJson.addProperty("limit", 0);
-            nationJson.addProperty("attackLimit", 0);
-            nationJson.addProperty("defenseLimit", 0);
-            nationJson.addProperty("stability", 10);
-            nationJson.addProperty("prosperity", 200);
-            nationJson.addProperty("efficiency", 0.5);
-            nationJson.addProperty("prestige", 100);
-            nationJson.addProperty("nobilityLoyalty", 5);
-            nationJson.addProperty("clergyLoyalty", 5);
-            nationJson.addProperty("commonersLoyalty", 5);
-            nationJson.addProperty("dishonor", 0);
-            nationJson.addProperty("replenishmentPoints", 0);
-            nationJson.addProperty("status", "Default Status");
-            nationJson.addProperty("mainDeity", "Default Deity");
-            nationJson.addProperty("mainRace", "Default Race");
-            nationJson.addProperty("rulerName", "Default Ruler");
-            nationJson.addProperty("rulerAge", 30);
-            nationJson.addProperty("rulerRace", "Default Race");
-            nationJson.addProperty("menuMaterial", "PAPER");
+            nationJson.addProperty("Название", nation.getName());
+            nationJson.addProperty("Доход", 0);
+            nationJson.addProperty("Лимит", 0);
+            nationJson.addProperty("Лимит_наступления", 0);
+            nationJson.addProperty("Лимит_защиты", 0);
+            nationJson.addProperty("Стабильность", 10);
+            nationJson.addProperty("Процветание", 200);
+            nationJson.addProperty("Эффективность", 0.5);
+            nationJson.addProperty("Престиж", 100);
+            nationJson.addProperty("Репутация_знати", 5);
+            nationJson.addProperty("Репутация_духовенства", 5);
+            nationJson.addProperty("Репутация_крестьян", 5);
+            nationJson.addProperty("Бесчестие", 0);
+            nationJson.addProperty("Очки_пополнения", 0);
+            nationJson.addProperty("Статус", "Default Status");
+            nationJson.addProperty("Главный_бог", "Default Deity");
+            nationJson.addProperty("Основная_раса", "Default Race");
+            nationJson.addProperty("Имя", "Default Ruler");
+            nationJson.addProperty("Возраст", 30);
+            nationJson.addProperty("Раса", "Default Race");
+            nationJson.addProperty("Материал_иконки", "PAPER");
 
             // Использование методов NationDataHandler для сохранения наций
             NationDataHandler.saveNationData(nationJson, NationDataHandler.formatNationName(nation.getName()));

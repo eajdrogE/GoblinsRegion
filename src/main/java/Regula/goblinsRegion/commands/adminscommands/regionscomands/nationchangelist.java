@@ -72,8 +72,8 @@ public class nationchangelist implements CommandExecutor, Listener {
                 continue;
             }
             // Теперь мы используем nationJson как объект JsonObject
-            String nationName = nationJson.has("name") ? nationJson.get("name").getAsString() : "Неизвестная нация";
-            String materialName = nationJson.has("menuMaterial") ? nationJson.get("menuMaterial").getAsString() : "MAP";
+            String nationName = nationJson.has("Название") ? nationJson.get("Название").getAsString() : "Неизвестная нация";
+            String materialName = nationJson.has("Материал_иконки") ? nationJson.get("Материал_иконки").getAsString() : "MAP";
             Material menuMaterial = Material.matchMaterial(materialName.toUpperCase());
 
             if (menuMaterial == null) {

@@ -68,59 +68,59 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
     private void addBasicPropertyItems(Inventory inventory, JsonObject townData) {
         addPropertyToInventory(inventory, 0, Material.PAPER, "Информация о регионе", formatTownInfo(townData));
-        addPropertyToInventory(inventory, 1, Material.PAPER, "name", townData.get("name").getAsString());
-        addPropertyToInventory(inventory, 2, Material.ANVIL, "stability", String.valueOf(townData.get("stability").getAsInt()));
-        addPropertyToInventory(inventory, 3, Material.GOLD_INGOT, "prosperity", String.valueOf(townData.get("prosperity").getAsInt()));
-        addPropertyToInventory(inventory, 4, Material.IRON_SWORD, "limit", String.valueOf(townData.get("limit").getAsInt()));
-        addPropertyToInventory(inventory, 5, Material.BREAD, "replenishmentPoints", String.valueOf(townData.get("replenishmentPoints").getAsInt()));
-        addPropertyToInventory(inventory, 6, Material.PAPER, "culture", townData.get("culture").getAsString());
-        addPropertyToInventory(inventory, 7, Material.WATER_BUCKET, "hasSeaAccess", String.valueOf(townData.get("hasSeaAccess").getAsBoolean()));
-        addPropertyToInventory(inventory, 8, Material.DIAMOND, "baseStability", String.valueOf(townData.get("baseStability").getAsInt()));
-        addPropertyToInventory(inventory, 9, Material.REDSTONE, "stabilityGrowthToBase", String.valueOf(townData.get("stabilityGrowthToBase").getAsInt()));
-        addPropertyToInventory(inventory, 10, Material.REDSTONE_TORCH, "stabilityGrowthBeyondBase", String.valueOf(townData.get("stabilityGrowthBeyondBase").getAsInt()));
-        addPropertyToInventory(inventory, 11, Material.EMERALD, "maxStability", String.valueOf(townData.get("maxStability").getAsInt()));
-        addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "prosperityGrowth", String.valueOf(townData.get("prosperityGrowth").getAsInt()));
-        addPropertyToInventory(inventory, 13, Material.IRON_BLOCK, "limitGrowth", String.valueOf(townData.get("limitGrowth").getAsInt()));
+        addPropertyToInventory(inventory, 1, Material.PAPER, "Название", townData.get("Название").getAsString());
+        addPropertyToInventory(inventory, 2, Material.ANVIL, "Стабильность", String.valueOf(townData.get("Стабильность").getAsInt()));
+        addPropertyToInventory(inventory, 3, Material.GOLD_INGOT, "Процветание", String.valueOf(townData.get("Процветание").getAsInt()));
+        addPropertyToInventory(inventory, 4, Material.IRON_SWORD, "Лимит", String.valueOf(townData.get("Лимит").getAsInt()));
+        addPropertyToInventory(inventory, 5, Material.BREAD, "Очки_пополнения", String.valueOf(townData.get("Очки_пополнения").getAsInt()));
+        addPropertyToInventory(inventory, 6, Material.PAPER, "Культура", townData.get("Культура").getAsString());
+        addPropertyToInventory(inventory, 7, Material.WATER_BUCKET, "Доступ_к_морю", String.valueOf(townData.get("Доступ_к_морю").getAsBoolean()));
+        addPropertyToInventory(inventory, 8, Material.DIAMOND, "Базовая_стабильность", String.valueOf(townData.get("Базовая_стабильность").getAsInt()));
+        addPropertyToInventory(inventory, 9, Material.REDSTONE, "Рост_стабильности_к_базовой", String.valueOf(townData.get("Рост_стабильности_к_базовой").getAsInt()));
+        addPropertyToInventory(inventory, 10, Material.REDSTONE_TORCH, "Рост_стабильности-за_пределами_базовой", String.valueOf(townData.get("Рост_стабильности-за_пределами_базовой").getAsInt()));
+        addPropertyToInventory(inventory, 11, Material.EMERALD, "Максимальная_стабильность", String.valueOf(townData.get("Максимальная_стабильность").getAsInt()));
+        addPropertyToInventory(inventory, 12, Material.GOLD_BLOCK, "Рост_процветания", String.valueOf(townData.get("Рост_процветания").getAsInt()));
+        addPropertyToInventory(inventory, 13, Material.IRON_BLOCK, "Рост_лимита", String.valueOf(townData.get("Рост_лимита").getAsInt()));
     }
 
     private void addSpecialPropertyItems(Inventory inventory, JsonObject townData, String townName) {
-        addPropertyToInventory(inventory, 14, Material.CHEST, "resources", "Выберите для управления");
-        Material menuMaterial = Material.valueOf(townData.get("menuMaterial").getAsString().toUpperCase());
-        addPropertyToInventory(inventory, 15, menuMaterial, "menuMaterial", "Выберите для управления");
-        addPropertyToInventory(inventory, 16, Material.BRICKS, "buildings", "Выберите для управления");
+        addPropertyToInventory(inventory, 14, Material.CHEST, "Ресурсы", "Выберите для управления");
+        Material menuMaterial = Material.valueOf(townData.get("Материал_иконки").getAsString().toUpperCase());
+        addPropertyToInventory(inventory, 15, menuMaterial, "Материал_иконки", "Выберите для управления");
+        addPropertyToInventory(inventory, 16, Material.BRICKS, "Постройки", "Выберите для управления");
     }
 
     private String formatTownInfo(JsonObject townData) {
         StringBuilder info = new StringBuilder();
 
         info.append(ChatColor.YELLOW).append("Название: ").append(ChatColor.WHITE)
-                .append(townData.get("name").getAsString()).append("\n");
+                .append(townData.get("Название").getAsString()).append("\n");
         info.append(ChatColor.YELLOW).append("Стабильность: ").append(ChatColor.WHITE)
-                .append(townData.get("stability").getAsInt()).append("\n");
+                .append(townData.get("Стабильность").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Процветание: ").append(ChatColor.WHITE)
-                .append(townData.get("prosperity").getAsInt()).append("\n");
+                .append(townData.get("Процветание").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Лимит: ").append(ChatColor.WHITE)
-                .append(townData.get("limit").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Очки пополнения: ").append(ChatColor.WHITE)
-                .append(townData.get("replenishmentPoints").getAsInt()).append("\n");
+                .append(townData.get("Лимит").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Очки_пополнения: ").append(ChatColor.WHITE)
+                .append(townData.get("Очки_пополнения").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Культура: ").append(ChatColor.WHITE)
-                .append(townData.get("culture").getAsString()).append("\n");
-        info.append(ChatColor.YELLOW).append("Доступ к морю: ").append(ChatColor.WHITE)
-                .append(townData.get("hasSeaAccess").getAsBoolean() ? "Да" : "Нет").append("\n");
+                .append(townData.get("Культура").getAsString()).append("\n");
+        info.append(ChatColor.YELLOW).append("Доступ_к_морю: ").append(ChatColor.WHITE)
+                .append(townData.get("Доступ_к_морю").getAsBoolean() ? "Да" : "Нет").append("\n");
         info.append(ChatColor.YELLOW).append("Базовая стабильность: ").append(ChatColor.WHITE)
-                .append(townData.get("baseStability").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Рост стабильности к базовой: ").append(ChatColor.WHITE)
-                .append(townData.get("stabilityGrowthToBase").getAsInt()).append("\n");
+                .append(townData.get("Базовая_стабильность").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост_стабильности_к_базовой: ").append(ChatColor.WHITE)
+                .append(townData.get("Рост_стабильности_к_базовой").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Рост стабильности за пределами базовой: ").append(ChatColor.WHITE)
-                .append(townData.get("stabilityGrowthBeyondBase").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Максимальная стабильность: ").append(ChatColor.WHITE)
-                .append(townData.get("maxStability").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Рост процветания: ").append(ChatColor.WHITE)
-                .append(townData.get("prosperityGrowth").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Рост лимита: ").append(ChatColor.WHITE)
-                .append(townData.get("limitGrowth").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Материал меню: ").append(ChatColor.WHITE)
-                .append(townData.get("menuMaterial").getAsString().toUpperCase());
+                .append(townData.get("Рост_стабильности-за_пределами_базовой").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Максимальная_стабильность: ").append(ChatColor.WHITE)
+                .append(townData.get("Максимальная_стабильность").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост_процветания: ").append(ChatColor.WHITE)
+                .append(townData.get("Рост_процветания").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Рост_лимита: ").append(ChatColor.WHITE)
+                .append(townData.get("Рост_лимита").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Материал_иконки: ").append(ChatColor.WHITE)
+                .append(townData.get("Материал_иконки").getAsString().toUpperCase());
 
         return info.toString();
     }

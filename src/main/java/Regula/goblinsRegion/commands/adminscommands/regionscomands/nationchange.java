@@ -56,48 +56,48 @@ public class nationchange implements CommandExecutor, Listener {
         // Создание GUI-меню
         Inventory inventory = Bukkit.createInventory(null, 27, "Нация: " + NationDataHandler.formatNationName(nationName));
         // Сборник всей информации нации в первом слоте
-        addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Общая информация",
-                "Доход: " + nationData.get("income").getAsInt(),
-                "Лимит ресурсов: " + nationData.get("limit").getAsInt(),
-                "Лимит атак: " + nationData.get("attackLimit").getAsInt(),
-                "Лимит защиты: " + nationData.get("defenseLimit").getAsInt(),
-                "Процветание: " + nationData.get("prosperity").getAsInt(),
-                "Эффективность: " + nationData.get("efficiency").getAsDouble(),
-                "Престиж: " + nationData.get("prestige").getAsInt(),
-                "Бесчестие: " + nationData.get("dishonor").getAsInt(),
-                "Репутация знати: " + nationData.get("nobilityLoyalty").getAsInt(),
-                "Репутация духовенства: " + nationData.get("clergyLoyalty").getAsInt(),
-                "Репутация крестьян: " + nationData.get("commonersLoyalty").getAsInt(),
-                "Главный бог: " + nationData.get("mainDeity").getAsString(),
-                "Основная раса: " + nationData.get("mainRace").getAsString(),
-                "Статус: " + nationData.get("status").getAsString()
+        addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Общая_информация",
+                "Доход: " + nationData.get("Доход").getAsInt(),
+                "Лимит: " + nationData.get("Лимит").getAsInt(),
+                "Лимит_наступления: " + nationData.get("Лимит_наступления").getAsInt(),
+                "Лимит_защиты: " + nationData.get("Лимит_защиты").getAsInt(),
+                "Процветание: " + nationData.get("Процветание").getAsInt(),
+                "Эффективность: " + nationData.get("Эффективность").getAsDouble(),
+                "Престиж: " + nationData.get("Престиж").getAsInt(),
+                "Бесчестие: " + nationData.get("Бесчестие").getAsInt(),
+                "Репутация_знати: " + nationData.get("Репутация_знати").getAsInt(),
+                "Репутация_духовенства: " + nationData.get("Репутация_духовенства").getAsInt(),
+                "Репутация_крестьян: " + nationData.get("Репутация_крестьян").getAsInt(),
+                "Главный_бог: " + nationData.get("Главный_бог").getAsString(),
+                "Основная_раса: " + nationData.get("Основная_раса").getAsString(),
+                "Статус: " + nationData.get("Статус").getAsString()
         );
 
 // Отдельные свойства
         addItemToInventory(inventory, Material.PLAYER_HEAD, ChatColor.DARK_BLUE + "Правитель",
-                "Имя: " + nationData.get("rulerName").getAsString(),
-                "Возраст: " + nationData.get("rulerAge").getAsInt(),
-                "Раса: " + nationData.get("rulerRace").getAsString());
-        addItemToInventory(inventory, Material.ZOMBIE_HEAD, ChatColor.BLUE + "Основная раса",
-                nationData.get("mainRace").getAsString());
+                "Имя: " + nationData.get("Имя").getAsString(),
+                "Возраст: " + nationData.get("Возраст").getAsInt(),
+                "Раса: " + nationData.get("Раса").getAsString());
+        addItemToInventory(inventory, Material.ZOMBIE_HEAD, ChatColor.BLUE + "Основная_раса",
+                nationData.get("Основная_раса").getAsString());
         addItemToInventory(inventory, Material.FEATHER, ChatColor.AQUA + "Статус",
-                nationData.get("status").getAsString());
-        addItemToInventory(inventory, Material.BLAZE_POWDER, ChatColor.GOLD + "Главный бог",
-                nationData.get("mainDeity").getAsString());
+                nationData.get("Статус").getAsString());
+        addItemToInventory(inventory, Material.BLAZE_POWDER, ChatColor.GOLD + "Главный_бог",
+                nationData.get("Главный_бог").getAsString());
         addItemToInventory(inventory, Material.EMERALD, ChatColor.GREEN + "Процветание",
-                String.valueOf(nationData.get("prosperity").getAsInt()));
+                String.valueOf(nationData.get("Процветание").getAsInt()));
         addItemToInventory(inventory, Material.EXPERIENCE_BOTTLE, ChatColor.GREEN + "Эффективность",
-                String.valueOf(nationData.get("efficiency").getAsDouble()));
+                String.valueOf(nationData.get("Эффективность").getAsDouble()));
         addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Престиж",
-                String.valueOf(nationData.get("prestige").getAsInt()));
+                String.valueOf(nationData.get("Престиж").getAsInt()));
         addItemToInventory(inventory, Material.REDSTONE, ChatColor.RED + "Бесчестие",
-                String.valueOf(nationData.get("dishonor").getAsInt()));
-        addItemToInventory(inventory, Material.PAPER, ChatColor.LIGHT_PURPLE + "Репутация знати",
-                String.valueOf(nationData.get("nobilityLoyalty").getAsInt()));
-        addItemToInventory(inventory, Material.BOOKSHELF, ChatColor.DARK_PURPLE + "Репутация духовенства",
-                String.valueOf(nationData.get("clergyLoyalty").getAsInt()));
-        addItemToInventory(inventory, Material.HAY_BLOCK, ChatColor.YELLOW + "Репутация крестьян",
-                String.valueOf(nationData.get("commonersLoyalty").getAsInt()));
+                String.valueOf(nationData.get("Бесчестие").getAsInt()));
+        addItemToInventory(inventory, Material.PAPER, ChatColor.LIGHT_PURPLE + "Репутация_знати",
+                String.valueOf(nationData.get("Репутация_знати").getAsInt()));
+        addItemToInventory(inventory, Material.BOOKSHELF, ChatColor.DARK_PURPLE + "Репутация_духовенства",
+                String.valueOf(nationData.get("Репутация_духовенства").getAsInt()));
+        addItemToInventory(inventory, Material.HAY_BLOCK, ChatColor.YELLOW + "Репутация_крестьян",
+                String.valueOf(nationData.get("Репутация_крестьян").getAsInt()));
         // Открытие меню для игрока
         player.openInventory(inventory);
         return true;

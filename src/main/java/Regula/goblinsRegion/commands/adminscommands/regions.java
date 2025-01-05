@@ -126,10 +126,6 @@ public class regions implements CommandExecutor, Listener {
     // Заглушки для методов
 
 
-    private void method2(Player player) {
-        player.sendMessage("Вызван метод 2: Изменение наций");
-    }
-
     private void method3(Player player) {
         player.sendMessage("Вызван метод 3: Изменение игровых духов");
     }

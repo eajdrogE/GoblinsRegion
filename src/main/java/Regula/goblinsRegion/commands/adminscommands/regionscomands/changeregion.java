@@ -77,8 +77,8 @@ public class changeregion implements CommandExecutor, Listener {
                 continue;
             }
 
-            String townName = townJson.has("name") ? townJson.get("name").getAsString() : "Неизвестный город";
-            String materialName = townJson.has("menuMaterial") ? townJson.get("menuMaterial").getAsString() : "PAPER";
+            String townName = townJson.has("Название") ? townJson.get("Название").getAsString() : "Неизвестный город";
+            String materialName = townJson.has("Материал_иконки") ? townJson.get("Материал_иконки").getAsString() : "PAPER";
             Material menuMaterial = Material.matchMaterial(materialName.toUpperCase());
 
             if (menuMaterial == null) {

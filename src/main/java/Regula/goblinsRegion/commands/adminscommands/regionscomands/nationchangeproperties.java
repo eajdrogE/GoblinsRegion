@@ -37,11 +37,10 @@ public class nationchangeproperties implements CommandExecutor {
             player.sendMessage("Использование: /nationchangeproperties <property> <nationName> <newValue>");
             return true;
         }
-        String propertyName= args[0];
-        String nationName  = args[1]; // Имя свойства
-        // Название нации
-        String newValue = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length)); // Новое значение
-    
+        String propertyName = args[0];
+        String nationName = args[1];
+        String newValue = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
+
         // Загружаем данные нации
         JsonObject nationData = NationDataHandler.loadNationData(nationName);
         if (nationData == null) {
@@ -58,7 +57,7 @@ public class nationchangeproperties implements CommandExecutor {
         player.sendMessage("Вы хотите изменить свойство " + propertyName + " нации " + nationName + "?");
 
         // Формируем команду для вставки в текстовое поле
-        String commandMessage = "/nationchangeproperties " + propertyName + " \"" + nationName + "\" \"" + newValue + "\"";
+        String commandMessage = "/nationchangeproperties " + propertyName + " " + nationName + " " + newValue + " ";
 
         // Формируем JSON для tellraw с кнопкой "ДА"
         TextComponent message = new TextComponent("Хотите изменить значение свойства " + propertyName + " нации " + nationName + "?\n");
@@ -93,19 +92,36 @@ public class nationchangeproperties implements CommandExecutor {
         // Сообщаем игроку, что данные обновлены
         if (propertyName.equalsIgnoreCase("name")) {
             boolean renamedProp = renameNationFileProp(nationName, newValue, nationData);
+//            boolean renamedRes = renameNationFileRes(nationName, newValue, nationData);
+//            boolean renamedBuild = renameNationFileBuild(nationName, newValue, nationData);
 
-            if (renamedProp) {
-                player.sendMessage("Название города успешно изменено на: " + newValue);
+            if (renamedProp /*&& renamedRes && renamedBuild*/) {
+                player.sendMessage("Название нации успешно изменено на: " + newValue);
             }
         }
         player.sendMessage("Свойство " + propertyName + " для нации " + nationName + " успешно изменено на: " + newValue);
         return true;
     }
+
+    // Методы для переименования файлов нации
     private boolean renameNationFileProp(String oldNationName, String newNationName, JsonObject nationData) {
         String oldFileName = "towny_data/nations/" + oldNationName + ".json";
         String newFileName = "towny_data/nations/" + newNationName + ".json";
         return renameFile(oldFileName, newFileName, nationData);
     }
+
+//    private boolean renameNationFileRes(String oldNationName, String newNationName, JsonObject nationData) {
+//        String oldFileName = "towny_data/nations_resources/" + oldNationName + ".json";
+//        String newFileName = "towny_data/nations_resources/" + newNationName + ".json";
+//        return renameFile(oldFileName, newFileName, nationData);
+//    }
+//
+//    private boolean renameNationFileBuild(String oldNationName, String newNationName, JsonObject nationData) {
+//        String oldFileName = "towny_data/nations_buildings/" + oldNationName + ".json";
+//        String newFileName = "towny_data/nations_buildings/" + newNationName + ".json";
+//        return renameFile(oldFileName, newFileName, nationData);
+//    }
+
     private boolean renameFile(String oldFileName, String newFileName, JsonObject nationData) {
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);
