@@ -28,12 +28,7 @@ public class TownsDataHandler {
         return loadJsonFromFile(path);
     }
 
-    // Функция для получения данных о ресурсах региона по имени города
-    public static JsonObject getRegionResources(String cityName) {
-        String formattedCityName = formatCityName(cityName);
-        String path = "towny_data/towns_resources/" + formattedCityName + ".json";
-        return loadJsonFromFile(path);
-    }
+
 
     // Новый метод для парсинга JSON, теперь принимает строку пути
     public static JsonObject parseJson(String filePath) {
@@ -79,17 +74,5 @@ public class TownsDataHandler {
         saveJsonToFile(cityData, path);
     }
 
-    // Метод для сохранения данных о зданиях города
-    public static void saveCityBuildings(JsonObject buildingsData, String cityName) {
-        String formattedCityName = formatCityName(cityName);
-        String path = "towny_data/towns_buildings/" + formattedCityName + ".json";
-        saveJsonToFile(buildingsData, path);
-    }
 
-    // Метод для сохранения данных о ресурсах города
-    public static void saveCityResources(JsonObject resourcesData, String cityName) {
-        String formattedCityName = formatCityName(cityName);
-        String path = "towny_data/towns_resources/" + formattedCityName + ".json";
-        saveJsonToFile(resourcesData, path);
-    }
 }

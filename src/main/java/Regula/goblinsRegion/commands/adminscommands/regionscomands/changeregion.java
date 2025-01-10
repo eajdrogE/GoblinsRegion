@@ -33,7 +33,7 @@ public class changeregion implements CommandExecutor, Listener {
 
         Player player = (Player) sender;
 
-        if (!player.hasPermission("RegionModer")) {
+        if (!player.hasPermission("RegionModer2")) {
             player.sendMessage("У вас нет прав для выполнения этой команды.");
             return true;
         }
@@ -78,7 +78,7 @@ public class changeregion implements CommandExecutor, Listener {
             }
 
             String townName = townJson.has("Название") ? townJson.get("Название").getAsString() : "Неизвестный город";
-            String materialName = townJson.has("Материал_иконки") ? townJson.get("Материал_иконки").getAsString() : "PAPER";
+            String materialName = townJson.has("Материал_иконки") ? townJson.get("Материал_иконки").getAsString() : "MAP";
             Material menuMaterial = Material.matchMaterial(materialName.toUpperCase());
 
             if (menuMaterial == null) {

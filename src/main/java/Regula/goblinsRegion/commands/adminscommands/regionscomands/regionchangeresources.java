@@ -47,14 +47,14 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void openResourcesMenu(Player player, String townName) {
-        JsonObject townData = TownsDataHandler.getRegionResources(townName);
+        JsonObject townData = TownsDataHandler.getRegionData(townName);
         if (townData == null) {
             player.sendMessage(ChatColor.RED + "Данные о городе " + townName + " не найдены.");
             return;
         }
 
         JsonArray resourceArray = townData.getAsJsonArray("resources");
-        if (resourceArray.size() == 0) {
+        if (resourceArray == null || resourceArray.size() == 0) {
             player.sendMessage(ChatColor.RED + "Ресурсы для города " + townName + " не найдены.");
             return;
         }
@@ -115,7 +115,6 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void handleResourceAction(Player player, String resourceName, String action) {
-        resourceName = resourceName.replaceAll(" \\(\\d+\\)", "");
 
         String townName = extractTownNameFromInventoryTitle(player.getOpenInventory().getTitle());
         if (townName == null) {
@@ -123,7 +122,7 @@ public class regionchangeresources implements CommandExecutor, Listener {
             return;
         }
 
-        JsonObject townData = TownsDataHandler.getRegionResources(townName);
+        JsonObject townData = TownsDataHandler.getRegionData(townName);
         if (townData == null) {
             player.sendMessage(ChatColor.RED + "Данные о городе не найдены.");
             return;
@@ -135,50 +134,36 @@ public class regionchangeresources implements CommandExecutor, Listener {
             return;
         }
 
-        boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN +"Добавить") ? 1 : -1, player);
+        boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1);
         if (updated) {
-            // Сохраняем обновлённые данные о ресурсе
-            saveCityResources(townName, townData);
+            // Сохраняем обновлённые данные города
+            TownsDataHandler.saveCityData(townData, townName);
             reopenResourcesMenu(player, townName);
         } else {
-            player.sendMessage(ChatColor.RED + "Ресурс \"" + resourceName +ChatColor.RED + "\" не найден.");
+            player.sendMessage(ChatColor.RED + "Ресурс \"" + resourceName + "\" не найден.");
         }
     }
 
-    private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta, Player player) {
-        String cleanResourceName = ChatColor.stripColor(resourceName); // Убираем цветовые коды
-
+    private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta) {
         for (int i = 0; i < resourceArray.size(); i++) {
             JsonObject resource = resourceArray.get(i).getAsJsonObject();
-            String cleanJsonResourceName = resource.get("name").getAsString();
-
-            // Отладка
-            if (cleanJsonResourceName.equals(cleanResourceName)) {
+            if (resource.get("name").getAsString().equals(resourceName)) {
                 int currentAmount = resource.get("amount").getAsInt();
-                int newAmount = Math.max(currentAmount + delta, 0); // Гарантируем, что количество не станет отрицательным
-                // Отладка
-                player.sendMessage("Изменение ресурса '" + cleanResourceName + "': " + currentAmount + " -> " + newAmount);
-                resource.addProperty("amount", newAmount); // Обновляем количество ресурса
+                resource.addProperty("amount", Math.max(currentAmount + delta, 0));
                 return true;
             }
         }
-
-        // Если ресурс не найден
-        player.sendMessage(ChatColor.RED + "Ресурс '" + resourceName + "' не найден в JSON.");
         return false;
     }
+
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
     }
+
     private String extractTownNameFromInventoryTitle(String title) {
         if (title.startsWith("Ресурсы региона: ")) {
             return title.substring("Ресурсы региона: ".length());
         }
         return null;
-    }
-
-    private void saveCityResources(String townName, JsonObject townData) {
-        // Сохраняем обновленные ресурсы города
-        TownsDataHandler.saveCityResources(townData, TownsDataHandler.formatCityName(townName));
     }
 }

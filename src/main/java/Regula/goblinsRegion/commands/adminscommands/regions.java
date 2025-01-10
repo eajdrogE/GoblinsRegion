@@ -102,7 +102,7 @@ public class regions implements CommandExecutor, Listener {
                     player.chat("/nationchangelist");
                     break;
                 case 2: // Изменение игровых духов
-                    method3(player);
+                    player.chat("/spiritlist");
                     break;
                 case 3: // Изменение решений
                     method4(player);

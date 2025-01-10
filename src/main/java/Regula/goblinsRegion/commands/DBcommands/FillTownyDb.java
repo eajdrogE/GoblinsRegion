@@ -14,7 +14,6 @@ import com.palmergames.bukkit.towny.object.Nation;
 import com.palmergames.bukkit.towny.object.Town;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -30,12 +29,8 @@ public class FillTownyDb implements CommandExecutor {
     }
 
     private void loadResources() {
-        try (FileReader reader = new FileReader("towny_data/resources.json")) {
-            JsonObject resourceData = JsonParser.parseReader(reader).getAsJsonObject();
-            availableResources.addAll(resourceData.getAsJsonArray("resources"));
-        } catch (IOException e) {
-            Bukkit.getLogger().severe("Не удалось загрузить доступные ресурсы: " + e.getMessage());
-        }
+        JsonObject resourceData = TownsDataHandler.getResourcesList();
+        availableResources.addAll(resourceData.getAsJsonArray("resources"));
     }
 
     @Override
@@ -75,26 +70,25 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("Очки_пополнения", 0);
             townJson.addProperty("Культура", "Default Culture");
             townJson.addProperty("Доступ_к_морю", false);
-            townJson.addProperty("Базовая стабильность", 10);
+            townJson.addProperty("Базовая_стабильность", 10);
             townJson.addProperty("Рост_стабильности_к_базовой", 1);
-            townJson.addProperty("Рост_стабильности-за_пределами_базовой", 0);
+            townJson.addProperty("Рост_стабильности_за_пределами_базовой", 0);
             townJson.addProperty("Максимальная_стабильность", 20);
             townJson.addProperty("Рост_процветания", 0);
             townJson.addProperty("Рост_лимита", 0);
             townJson.addProperty("Материал_иконки", "PAPER");
 
-            // Запись основных данных города в папку towny_data/towns
+            // Добавление данных ресурсов в объект города
+            JsonArray resources = getRegionResources(town.getName());
+            townJson.add("Ресурсы", resources);
+
+            // Запись данных города
             try (FileWriter writer = new FileWriter(new File(townsDir, TownsDataHandler.formatCityName(town.getName()) + ".json"))) {
                 gson.toJson(townJson, writer);
             } catch (IOException e) {
                 player.sendMessage("Ошибка записи данных города: " + TownsDataHandler.formatCityName(town.getName()));
                 e.printStackTrace();
             }
-
-            // Запись ресурсов города в папку towny_data/towns_resources
-            JsonObject townResourcesJson = new JsonObject();
-            townResourcesJson.add("resources", getRegionResources(town.getName()));
-            TownsDataHandler.saveCityResources(townResourcesJson, town.getName());
         }
 
         // Обработка наций
@@ -123,7 +117,7 @@ public class FillTownyDb implements CommandExecutor {
             nationJson.addProperty("Раса", "Default Race");
             nationJson.addProperty("Материал_иконки", "PAPER");
 
-            // Использование методов NationDataHandler для сохранения наций
+            // Сохранение данных нации
             NationDataHandler.saveNationData(nationJson, NationDataHandler.formatNationName(nation.getName()));
         }
 
@@ -142,7 +136,7 @@ public class FillTownyDb implements CommandExecutor {
             townResource.addProperty("material", resource.get("material").getAsString());
 
             // Добавление случайного количества ресурсов для города
-            int randomAmount = 0;
+            int randomAmount = random.nextInt(100) + 1; // Пример: случайное значение от 1 до 100
             townResource.addProperty("amount", randomAmount);
 
             resources.add(townResource);
@@ -150,6 +144,4 @@ public class FillTownyDb implements CommandExecutor {
 
         return resources;
     }
-
-
 }
