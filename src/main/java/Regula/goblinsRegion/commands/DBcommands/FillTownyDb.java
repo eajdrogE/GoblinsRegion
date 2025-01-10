@@ -80,7 +80,7 @@ public class FillTownyDb implements CommandExecutor {
 
             // Добавление данных ресурсов в объект города
             JsonArray resources = getRegionResources(town.getName());
-            townJson.add("Ресурсы", resources);
+            townJson.add("resources", resources);
 
             // Запись данных города
             try (FileWriter writer = new FileWriter(new File(townsDir, TownsDataHandler.formatCityName(town.getName()) + ".json"))) {
