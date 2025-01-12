@@ -32,3 +32,9 @@ commands:
   nationchangeproperties:
     description: "Изменяет свойства нации."
     usage: "/nationchangeproperties <property> <nationName> <variables>"
+  spiritpropertiesadmin:
+    description: "Изменяет свойства игрового духа."
+    usage: "/spiritpropertiesadmin <property> <spititName> <variables>"
+  spiritlist:
+    description: "Открывает меню с игровыми духами."
+    usage: "/spiritlist"
