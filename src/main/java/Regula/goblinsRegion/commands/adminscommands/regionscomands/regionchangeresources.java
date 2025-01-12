@@ -79,8 +79,8 @@ public class regionchangeresources implements CommandExecutor, Listener {
     }
 
     private void addResourcePair(Inventory inventory, int startSlot, Material material, String resourceName, int amount) {
-        ItemStack addItem = createResourceItem(material, resourceName, "Добавить", amount);
-        ItemStack removeItem = createResourceItem(material, resourceName, "Удалить", amount);
+        ItemStack addItem = createResourceItem(material, resourceName, ChatColor.GREEN +"Добавить", amount);
+        ItemStack removeItem = createResourceItem(material, resourceName, ChatColor.RED + "Удалить", amount);
 
         inventory.setItem(startSlot, addItem);
         inventory.setItem(startSlot + 1, removeItem);
@@ -90,8 +90,8 @@ public class regionchangeresources implements CommandExecutor, Listener {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(ChatColor.YELLOW + resourceName + " (" + amount + ")");
-            meta.setLore(List.of(ChatColor.GREEN + action));
+            meta.setDisplayName(resourceName + " (" + amount + ")");
+            meta.setLore(List.of(action));
             item.setItemMeta(meta);
         }
         return item;
@@ -108,14 +108,14 @@ public class regionchangeresources implements CommandExecutor, Listener {
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
 
         Player player = (Player) event.getWhoClicked();
-        String resourceName = clickedItem.getItemMeta().getDisplayName();
+        String displayName = clickedItem.getItemMeta().getDisplayName();
+        String resourceName = displayName.split(" ")[0]; // Получаем только первое слово
         String action = clickedItem.getItemMeta().getLore().get(0);
 
         handleResourceAction(player, resourceName, action);
     }
 
     private void handleResourceAction(Player player, String resourceName, String action) {
-
         String townName = extractTownNameFromInventoryTitle(player.getOpenInventory().getTitle());
         if (townName == null) {
             player.sendMessage(ChatColor.RED + "Не удалось определить город.");
@@ -134,27 +134,34 @@ public class regionchangeresources implements CommandExecutor, Listener {
             return;
         }
 
-        boolean updated = updateResourceAmount(resourceArray, resourceName, action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1);
+        // Определяем изменение количества
+        int delta = action.equals(ChatColor.GREEN + "Добавить") ? 1 : -1; // Пример: изменяем на 10 единиц
+
+        boolean updated = updateResourceAmount(resourceArray, resourceName, delta);
         if (updated) {
-            // Сохраняем обновлённые данные города
-            TownsDataHandler.saveCityData(townData, townName);
-            reopenResourcesMenu(player, townName);
+            // Сохраняем изменённые ресурсы в данных города
+            townData.add("resources", resourceArray);
+            TownsDataHandler.saveCityData(townData, townName); // Сохранение данных города
+            reopenResourcesMenu(player, townName); // Обновляем GUI для игрока
         } else {
             player.sendMessage(ChatColor.RED + "Ресурс \"" + resourceName + "\" не найден.");
         }
     }
+
 
     private boolean updateResourceAmount(JsonArray resourceArray, String resourceName, int delta) {
         for (int i = 0; i < resourceArray.size(); i++) {
             JsonObject resource = resourceArray.get(i).getAsJsonObject();
             if (resource.get("name").getAsString().equals(resourceName)) {
                 int currentAmount = resource.get("amount").getAsInt();
-                resource.addProperty("amount", Math.max(currentAmount + delta, 0));
+                int newAmount = Math.max(currentAmount + delta, 0); // Убедимся, что не уходим в отрицательное
+                resource.addProperty("amount", newAmount); // Обновляем значение
                 return true;
             }
         }
-        return false;
+        return false; // Ресурс не найден
     }
+
 
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
