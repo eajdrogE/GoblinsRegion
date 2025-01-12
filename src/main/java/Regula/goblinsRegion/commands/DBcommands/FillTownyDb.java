@@ -66,7 +66,7 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("Название", TownsDataHandler.formatCityName(town.getName()));
             townJson.addProperty("Стабильность", 10);
             townJson.addProperty("Процветание", 200);
-            townJson.addProperty("Лимит", 1);
+            townJson.addProperty("Военный_ресурс", 1);
             townJson.addProperty("Очки_пополнения", 0);
             townJson.addProperty("Культура", "Default Culture");
             townJson.addProperty("Доступ_к_морю", false);
@@ -75,7 +75,7 @@ public class FillTownyDb implements CommandExecutor {
             townJson.addProperty("Рост_стабильности_за_пределами_базовой", 0);
             townJson.addProperty("Максимальная_стабильность", 20);
             townJson.addProperty("Рост_процветания", 0);
-            townJson.addProperty("Рост_лимита", 0);
+            townJson.addProperty("Рост_военного_ресурса", 0);
             townJson.addProperty("Материал_иконки", "PAPER");
 
             // Добавление данных ресурсов в объект города
@@ -97,7 +97,7 @@ public class FillTownyDb implements CommandExecutor {
             JsonObject nationJson = new JsonObject();
             nationJson.addProperty("Название", nation.getName());
             nationJson.addProperty("Доход", 0);
-            nationJson.addProperty("Лимит", 0);
+            nationJson.addProperty("Военный_ресурс", 0);
             nationJson.addProperty("Лимит_наступления", 0);
             nationJson.addProperty("Лимит_защиты", 0);
             nationJson.addProperty("Стабильность", 10);

@@ -101,10 +101,10 @@ public class regionchangeproperties implements CommandExecutor {
         // Сообщаем игроку, что данные обновлены
         if (propertyName.equalsIgnoreCase("name")) {
             boolean renamedProp = renameTownFileProp(townName, newValue, townData);
-            boolean renamedRes = renameTownFileRes(townName, newValue, townData);
-            boolean renamedBuild = renameTownFileBuild(townName, newValue, townData);
+          //  boolean renamedRes = renameTownFileRes(townName, newValue, townData);
+          //  boolean renamedBuild = renameTownFileBuild(townName, newValue, townData);
 
-            if (renamedProp && renamedRes && renamedBuild) {
+            if (renamedProp /*&& renamedRes && renamedBuild*/) {
                 player.sendMessage("Название города успешно изменено на: " + newValue);
             }
         }
@@ -118,7 +118,7 @@ public class regionchangeproperties implements CommandExecutor {
         return renameFile(oldFileName, newFileName, townData);
     }
 
-    private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
+   /* private boolean renameTownFileRes(String oldTownName, String newTownName, JsonObject townData) {
         String oldFileName = "towny_data/towns_resources/" + oldTownName + ".json";
         String newFileName = "towny_data/towns_resources/" + newTownName + ".json";
         return renameFile(oldFileName, newFileName, townData);
@@ -129,7 +129,7 @@ public class regionchangeproperties implements CommandExecutor {
         String newFileName = "towny_data/towns_buildings/" + newTownName + ".json";
         return renameFile(oldFileName, newFileName, townData);
     }
-
+*/
     private boolean renameFile(String oldFileName, String newFileName, JsonObject townData) {
         File oldFile = new File(oldFileName);
         File newFile = new File(newFileName);

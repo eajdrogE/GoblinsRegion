@@ -58,7 +58,7 @@ public class nationchange implements CommandExecutor, Listener {
         // Сборник всей информации нации в первом слоте
         addItemToInventory(inventory, Material.BOOK, ChatColor.AQUA + "Общая_информация",
                 "Доход: " + nationData.get("Доход").getAsInt(),
-                "Лимит: " + nationData.get("Лимит").getAsInt(),
+                "Военный_ресурс: " + nationData.get("Военный_ресурс").getAsInt(),
                 "Лимит_наступления: " + nationData.get("Лимит_наступления").getAsInt(),
                 "Лимит_защиты: " + nationData.get("Лимит_защиты").getAsInt(),
                 "Процветание: " + nationData.get("Процветание").getAsInt(),

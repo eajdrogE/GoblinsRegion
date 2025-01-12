@@ -69,8 +69,8 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
                 "Текущая: " + townData.get("Стабильность").getAsInt());
         addItemToInventory(inventory, Material.GOLD_INGOT,  "Процветание",
                 "Текущее: " + townData.get("Процветание").getAsInt());
-        addItemToInventory(inventory, Material.IRON_SWORD,  "Лимит",
-                "Текущий: " + townData.get("Лимит").getAsInt());
+        addItemToInventory(inventory, Material.IRON_SWORD,  "Военный_ресурс",
+                "Текущий: " + townData.get("Военный_ресурс").getAsInt());
         addItemToInventory(inventory, Material.BREAD,  "Очки_пополнения",
                 "Текущие: " + townData.get("Очки_пополнения").getAsInt());
         addItemToInventory(inventory, Material.PAPER,  "Культура",
@@ -108,8 +108,8 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
                 .append(townData.get("Стабильность").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Процветание: ").append(ChatColor.WHITE)
                 .append(townData.get("Процветание").getAsInt()).append("\n");
-        info.append(ChatColor.YELLOW).append("Лимит: ").append(ChatColor.WHITE)
-                .append(townData.get("Лимит").getAsInt()).append("\n");
+        info.append(ChatColor.YELLOW).append("Военный_ресурс: ").append(ChatColor.WHITE)
+                .append(townData.get("Военный_ресурс").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Очки_пополнения: ").append(ChatColor.WHITE)
                 .append(townData.get("Очки_пополнения").getAsInt()).append("\n");
         info.append(ChatColor.YELLOW).append("Культура: ").append(ChatColor.WHITE)
