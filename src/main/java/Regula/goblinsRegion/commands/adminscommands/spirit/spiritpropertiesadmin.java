@@ -67,30 +67,18 @@ public class spiritpropertiesadmin implements CommandExecutor, Listener {
                 "Название: " + spiritData.get("Название").getAsString());
         addItemToInventoryIfPresent(inventory, Material.BOOK, "Описание",
                 spiritData.get("Описание").getAsString());
-        addItemToInventoryIfPresent(inventory, Material.ENCHANTED_BOOK, "Тип_духа",
-                "Тип: " + spiritData.get("Тип_духа").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.PAPER, "Влияние_на_культуру",
-                "Эффект: " + spiritData.get("Влияние_на_культуру").getAsString());
-        addItemToInventoryIfPresent(inventory, Material.BEACON, "Стабильность",
-                "Текущая: " + spiritData.get("Стабильность").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.GOLD_INGOT, "Процветание",
-                "Текущее: " + spiritData.get("Процветание").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.IRON_BLOCK, "Лимит",
-                "Текущий: " + spiritData.get("Лимит").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.BREAD, "Очки_пополнения",
-                "Текущие: " + spiritData.get("Очки_пополнения").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.DIAMOND, "Плюс_базовая_стабильность",
-                "Плюс: " + spiritData.get("Плюс_базовая_стабильность").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.REDSTONE, "Рост_стабильности_к_базовой",
-                "Рост: " + spiritData.get("Рост_стабильности_к_базовой").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.REDSTONE_TORCH, "Рост_стабильности_за_пределами_базовой",
-                "Рост: " + spiritData.get("Рост_стабильности_за_пределами_базовой").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.EMERALD, "Максимальная_стабильность",
-                "Максимальная: " + spiritData.get("Максимальная_стабильность").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.GOLD_BLOCK, "Рост_процветания",
-                "Рост: " + spiritData.get("Рост_процветания").getAsInt());
-        addItemToInventoryIfPresent(inventory, Material.IRON_INGOT, "Рост_лимита",
-                "Рост: " + spiritData.get("Рост_лимита").getAsInt());
+        addItemToInventoryIfPresent(inventory, Material.ENCHANTED_BOOK, "Тип_духа",  String.valueOf(spiritData.get("Тип_духа").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.PAPER, "Влияние_на_культуру", spiritData.get("Влияние_на_культуру").getAsString());
+        addItemToInventoryIfPresent(inventory, Material.BEACON, "Стабильность", String.valueOf(spiritData.get("Стабильность").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.GOLD_INGOT, "Процветание", String.valueOf(spiritData.get("Процветание").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.IRON_BLOCK, "Военный_ресурс", String.valueOf(spiritData.get("Военный_ресурс").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.BREAD, "Очки_пополнения", String.valueOf(spiritData.get("Очки_пополнения").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.DIAMOND, "Плюс_базовая_стабильность", String.valueOf(spiritData.get("Плюс_базовая_стабильность").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.REDSTONE, "Рост_стабильности_к_базовой", String.valueOf(spiritData.get("Рост_стабильности_к_базовой").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.REDSTONE_TORCH, "Рост_стабильности_за_пределами_базовой", String.valueOf(spiritData.get("Рост_стабильности_за_пределами_базовой").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.EMERALD, "Максимальная_стабильность", String.valueOf(spiritData.get("Максимальная_стабильность").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.GOLD_BLOCK, "Рост_процветания", String.valueOf(spiritData.get("Рост_процветания").getAsInt()));
+        addItemToInventoryIfPresent(inventory, Material.IRON_INGOT, "Рост_лимита", String.valueOf(spiritData.get("Рост_лимита").getAsInt()));
     }
 
     private void addSpecialPropertyItems(Inventory inventory, JsonObject spiritData, String spiritName) {
