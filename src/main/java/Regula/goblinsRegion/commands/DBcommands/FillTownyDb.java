@@ -116,7 +116,8 @@ public class FillTownyDb implements CommandExecutor {
             nationJson.addProperty("Возраст", 30);
             nationJson.addProperty("Раса", "Default Race");
             nationJson.addProperty("Материал_иконки", "PAPER");
-
+            JsonArray spirits = new JsonArray();
+            nationJson.add("spirits", spirits);
             // Сохранение данных нации
             NationDataHandler.saveNationData(nationJson, NationDataHandler.formatNationName(nation.getName()));
         }
