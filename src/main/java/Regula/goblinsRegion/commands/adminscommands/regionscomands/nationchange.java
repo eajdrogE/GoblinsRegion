@@ -73,7 +73,7 @@ public class nationchange implements CommandExecutor, Listener {
                 "Статус: " + nationData.get("Статус").getAsString()
         );
 
-// Отдельные свойства
+        // Отдельные свойства
         addItemToInventory(inventory, Material.PLAYER_HEAD, ChatColor.DARK_BLUE + "Правитель",
                 "Имя: " + nationData.get("Имя").getAsString(),
                 "Возраст: " + nationData.get("Возраст").getAsInt(),
@@ -98,10 +98,15 @@ public class nationchange implements CommandExecutor, Listener {
                 String.valueOf(nationData.get("Репутация_духовенства").getAsInt()));
         addItemToInventory(inventory, Material.HAY_BLOCK, ChatColor.YELLOW + "Репутация_крестьян",
                 String.valueOf(nationData.get("Репутация_крестьян").getAsInt()));
+
+        // Ячейка для духов
+        addItemToInventory(inventory, Material.GHAST_TEAR, ChatColor.BLUE + "Духи", "Посмотреть духов нации");
+
         // Открытие меню для игрока
         player.openInventory(inventory);
         return true;
     }
+
     private void addItemToInventory(Inventory inventory, Material material, String name, String... loreLines) {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
@@ -112,6 +117,7 @@ public class nationchange implements CommandExecutor, Listener {
         }
         inventory.addItem(item);
     }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player)) return;
@@ -128,6 +134,12 @@ public class nationchange implements CommandExecutor, Listener {
 
             if (itemName.equals(ChatColor.DARK_BLUE + "Правитель")) {
                 player.sendMessage(ChatColor.YELLOW + "Это свойство предназначено только для просмотра.");
+                return;
+            }
+
+            if (itemName.equals(ChatColor.BLUE + "Духи")) {
+                player.closeInventory();
+                player.chat("/viewspirits " + nationName);
                 return;
             }
 
