@@ -66,7 +66,7 @@ public final class GoblinsRegion extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        getLogger().info("GoblinsRegion плагин выключен.");
+        getLogger().info("GoblinRegion плагин выключен.");
     }
 
     /**
