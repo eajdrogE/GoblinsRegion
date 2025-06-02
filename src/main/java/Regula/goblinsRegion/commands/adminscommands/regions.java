@@ -36,19 +36,13 @@ public class regions implements CommandExecutor, Listener {
         }
 
         Player player = (Player) sender;
-
-        // Проверка прав через LuckPerms
         LuckPerms luckPerms = LuckPermsProvider.get();
         User user = luckPerms.getUserManager().getUser(player.getUniqueId());
         if (user == null || !user.getCachedData().getPermissionData().checkPermission("RegionModer").asBoolean()) {
             player.sendMessage(ChatColor.RED + "У вас нет прав для выполнения этой команды.");
             return true;
         }
-
-        // Создание инвентаря
         Inventory inventory = Bukkit.createInventory(null, 18, ChatColor.DARK_GREEN + "Меню настройки регионов");
-
-        // Добавление элементов в инвентарь
         addItem(inventory, Material.OAK_FENCE, 0, ChatColor.YELLOW + "Изменение регионов");
         addItem(inventory, Material.COBBLESTONE_WALL, 1, ChatColor.YELLOW + "Изменение наций");
         addItem(inventory, Material.ANVIL, 2, ChatColor.YELLOW + "Изменение игровых духов");
@@ -56,20 +50,15 @@ public class regions implements CommandExecutor, Listener {
         addItem(inventory, Material.OAK_SIGN, 4, ChatColor.YELLOW + "Изменение событий");
         addItem(inventory, Material.IRON_SWORD, 5, ChatColor.YELLOW + "Ведение войн");
         addItem(inventory, Material.PAPER, 6, ChatColor.YELLOW + "Внешняя политика");
-
-        // Заполнение остальных ячеек серым стеклом
         ItemStack filler = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
         ItemMeta fillerMeta = filler.getItemMeta();
         if (fillerMeta != null) fillerMeta.setDisplayName(" ");
         filler.setItemMeta(fillerMeta);
-
         for (int i = 0; i < inventory.getSize(); i++) {
             if (inventory.getItem(i) == null) {
                 inventory.setItem(i, filler);
             }
         }
-
-        // Открытие инвентаря для игрока
         player.openInventory(inventory);
         return true;
     }
