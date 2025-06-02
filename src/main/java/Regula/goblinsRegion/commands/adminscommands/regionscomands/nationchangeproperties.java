@@ -40,23 +40,15 @@ public class nationchangeproperties implements CommandExecutor {
         String propertyName = args[0];
         String nationName = args[1];
         String newValue = String.join(" ", java.util.Arrays.copyOfRange(args, 2, args.length));
-
-        // Загружаем данные нации
         JsonObject nationData = NationDataHandler.loadNationData(nationName);
         if (nationData == null) {
             player.sendMessage("Нация " + nationName + " не найдена.");
             return true;
         }
-
-        // Если значение передано, сразу обновляем JSON
         if (args.length >= 3) {
             return updateNationProperty(player, propertyName, nationName, newValue, nationData);
         }
-
-        // Если значения нет, выводим запрос на ввод через чат
         player.sendMessage("Вы хотите изменить свойство " + propertyName + " нации " + nationName + "?");
-
-        // Формируем команду для вставки в текстовое поле
         String commandMessage = "/nationchangeproperties " + propertyName + " " + nationName + " " + newValue + " ";
 
         // Формируем JSON для tellraw с кнопкой "ДА"
