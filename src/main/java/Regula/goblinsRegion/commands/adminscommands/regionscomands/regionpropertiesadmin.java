@@ -26,7 +26,6 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
             sender.sendMessage("Эту команду могут использовать только игроки.");
             return true;
         }
-
         Player player = (Player) sender;
         if (!player.hasPermission("RegionModer")) {
             player.sendMessage("У вас нет прав для выполнения этой команды.");
@@ -46,22 +45,17 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
     private JsonObject loadTownData(String townName) {
         return TownsDataHandler.getRegionData(townName);
     }
-
     private void openRegionProperties(Player player, String townName) {
         JsonObject townData = loadTownData(townName);
         if (townData == null) {
             player.sendMessage("Данные о городе " + townName + " не найдены.");
             return;
         }
-
         Inventory inventory = Bukkit.createInventory(null, 27, "Регион: " + townName);
-
-        // Добавляем данные в инвентарь
         addBasicPropertyItems(inventory, townData);
         addSpecialPropertyItems(inventory, townData, townName);
         player.openInventory(inventory);
     }
-
     private void addBasicPropertyItems(Inventory inventory, JsonObject townData) {
         addItemToInventory(inventory, Material.PLAYER_HEAD, ChatColor.DARK_BLUE + "Информация_о_регионе",
                 "Название: " + townData.get("Название").getAsString());
@@ -90,8 +84,6 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
         addItemToInventory(inventory, Material.IRON_BLOCK,  "Рост_лимита",
                 "Рост: " + townData.get("Рост_лимита").getAsInt());
     }
-
-
     private void addSpecialPropertyItems(Inventory inventory, JsonObject townData, String townName) {
         addItemToInventory(inventory, Material.CHEST, "Ресурсы", "Выберите для управления");
         Material menuMaterial = Material.valueOf(townData.has("Материал_иконки") ? townData.get("Материал_иконки").getAsString().toUpperCase() : "PAPER");
@@ -133,7 +125,6 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
 
         return info.toString();
     }
-
 //    private void addPropertyToInventory(Inventory inventory, int slot, Material material, String displayName, String lore) {
 //        ItemStack item = new ItemStack(material);
 //        ItemMeta meta = item.getItemMeta();
@@ -158,12 +149,9 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getView().getTitle();
         if (!title.startsWith("Регион: ")) return;
-
         event.setCancelled(true);
-
         ItemStack clickedItem = event.getCurrentItem();
         if (clickedItem == null || clickedItem.getType() == Material.AIR) return;
-
         Player player = (Player) event.getWhoClicked();
         String townName = title.substring("Регион: ".length());
         handlePropertySelection(player, clickedItem, TownsDataHandler.formatCityName(townName));
@@ -172,7 +160,6 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
     private void handlePropertySelection(Player player, ItemStack clickedItem, String townName) {
         String itemName = clickedItem.getItemMeta().getDisplayName();
         String command;
-
         if (itemName.equals("Ресурсы")) {
             command = "/regionchangeresources " + townName + "";
         } else if (itemName.equals("Постройки")) {
@@ -181,8 +168,8 @@ public class regionpropertiesadmin implements CommandExecutor, Listener {
             String propertyName = itemName.split(": ")[0];
             command = "/regionchangeproperties " + propertyName  +" "+ townName;
         }
-
         player.closeInventory();
         player.chat(command);
     }
 }
+S
