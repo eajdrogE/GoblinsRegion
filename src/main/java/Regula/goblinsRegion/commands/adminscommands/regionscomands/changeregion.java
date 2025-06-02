@@ -120,10 +120,8 @@ public class changeregion implements CommandExecutor, Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
-        // Проверяем, что это наш кастомный инвентарь
         if (event.getView().getTitle().equals(ChatColor.DARK_GREEN + "RegionList")) {
             event.setCancelled(true); // Блокируем взаимодействие
-            // Проверка, что клик в верхнем инвентаре
             int slot = event.getRawSlot();
             if (slot >= event.getView().getTopInventory().getSize()) {
                 return; // Игнорируем клики в инвентаре игрока
@@ -132,13 +130,10 @@ public class changeregion implements CommandExecutor, Listener {
             if (clickedItem == null || clickedItem.getType() == Material.AIR) {
                 return; // Игнорируем пустые слоты
             }
-            // Проверяем наличие метаданных
             if (!clickedItem.hasItemMeta() || clickedItem.getItemMeta().getDisplayName() == null) {
                 return;
             }
             String itemName = clickedItem.getItemMeta().getDisplayName();
-
-            // Обработка перехода между страницами
             if (itemName.equals("Предыдущая страница")) {
                 String[] titleParts = event.getView().getTitle().split(" "); // Разделяем заголовок для получения страницы
                 int currentPage = titleParts.length > 1 ? Integer.parseInt(titleParts[1]) : 0;
