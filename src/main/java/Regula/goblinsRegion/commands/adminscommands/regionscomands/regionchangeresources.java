@@ -166,7 +166,6 @@ public class regionchangeresources implements CommandExecutor, Listener {
     private void reopenResourcesMenu(Player player, String townName) {
         openResourcesMenu(player, townName);
     }
-
     private String extractTownNameFromInventoryTitle(String title) {
         if (title.startsWith("Ресурсы региона: ")) {
             return title.substring("Ресурсы региона: ".length());
